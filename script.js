@@ -36,7 +36,7 @@ function createSlug(name) {
 
 
 /* =========================
-   URL DE LA APP
+   URL
 ========================= */
 
 function getAppUrl(app) {
@@ -49,6 +49,547 @@ function getAppUrl(app) {
             createSlug(app.name)
         )
     );
+
+}
+
+
+/* =========================
+   ESTILOS DEL EMERGENTE
+========================= */
+
+const popupStyle =
+    document.createElement("style");
+
+popupStyle.textContent = `
+
+#pkgxAppPopup {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 999999;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(0,0,0,.82);
+
+    backdrop-filter: blur(8px);
+
+}
+
+#pkgxAppPopup .popup-box {
+
+    width: min(430px, 100%);
+
+    max-height: 90vh;
+
+    overflow-y: auto;
+
+    background: #101722;
+
+    border: 1px solid #263242;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 25px 80px rgba(0,0,0,.55);
+
+    overflow: hidden;
+
+    position: relative;
+
+}
+
+#pkgxAppPopup .popup-image {
+
+    width: 100%;
+
+    display: block;
+
+    max-height: 330px;
+
+    object-fit: cover;
+
+}
+
+#pkgxAppPopup .popup-content {
+
+    padding: 20px;
+
+}
+
+#pkgxAppPopup .popup-category {
+
+    display: inline-block;
+
+    padding: 5px 10px;
+
+    border-radius: 999px;
+
+    background: rgba(57,255,136,.10);
+
+    color: #39ff88;
+
+    font-size: 12px;
+
+    margin-bottom: 10px;
+
+}
+
+#pkgxAppPopup h2 {
+
+    margin: 0 0 8px;
+
+    color: #ffffff;
+
+    font-size: 24px;
+
+}
+
+#pkgxAppPopup .popup-version {
+
+    color: #9da8b7;
+
+    font-size: 14px;
+
+    margin-bottom: 20px;
+
+}
+
+#pkgxAppPopup .popup-download {
+
+    display: block;
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    text-align: center;
+
+    text-decoration: none;
+
+    padding: 12px 16px;
+
+    border-radius: 10px;
+
+    background: #39ff88;
+
+    color: #07100b;
+
+    font-weight: 700;
+
+}
+
+#pkgxAppPopup .popup-close {
+
+    position: absolute;
+
+    top: 12px;
+
+    right: 12px;
+
+    width: 36px;
+
+    height: 36px;
+
+    border: 0;
+
+    border-radius: 50%;
+
+    background: rgba(0,0,0,.65);
+
+    color: white;
+
+    font-size: 24px;
+
+    line-height: 36px;
+
+    cursor: pointer;
+
+    z-index: 2;
+
+}
+
+#pkgxAppPopup .popup-close:hover {
+
+    background: rgba(0,0,0,.85);
+
+}
+
+body.pkgx-popup-open {
+
+    overflow: hidden;
+
+}
+
+`;
+
+document.head.appendChild(
+    popupStyle
+);
+
+
+/* =========================
+   ABRIR EMERGENTE
+========================= */
+
+function openAppPopup(app) {
+
+    closeAppPopup();
+
+
+    const popup =
+        document.createElement("div");
+
+    popup.id =
+        "pkgxAppPopup";
+
+
+    popup.innerHTML = `
+
+        <div class="popup-box">
+
+            <button
+                class="popup-close"
+                type="button"
+                aria-label="Cerrar"
+            >
+                ×
+            </button>
+
+            <img
+                class="popup-image"
+                src="${app.image || "https://placehold.co/900x500/101722/39ff88?text=PKGX+STORE"}"
+                alt="${app.name || "Aplicación"}"
+            >
+
+            <div class="popup-content">
+
+                <span class="popup-category">
+                    ${app.category || "Otros"}
+                </span>
+
+                <h2>
+                    ${app.name || "Aplicación sin nombre"}
+                </h2>
+
+                <div class="popup-version">
+                    Versión ${app.version || "N/A"}
+                </div>
+
+                <a
+                    class="popup-download"
+                    href="${app.download || "#"}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Descargar
+                </a>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(
+        popup
+    );
+
+
+    document.body.classList.add(
+        "pkgx-popup-open"
+    );
+
+
+    /* Cerrar con X */
+
+    popup
+        .querySelector(".popup-close")
+        .addEventListener(
+            "click",
+            closeAppPopup
+        );
+
+
+    /* Cerrar tocando fuera */
+
+    popup.addEventListener(
+        "click",
+        function(event) {
+
+            if (
+                event.target === popup
+            ) {
+
+                closeAppPopup();
+
+            }
+
+        }
+    );
+
+
+    /* ESC */
+
+    document.addEventListener(
+        "keydown",
+        popupEscHandler
+    );
+
+
+    /*
+     * Cambiar URL sin recargar
+     */
+
+    history.pushState(
+        {
+            app:
+                createSlug(app.name)
+        },
+        "",
+        getAppUrl(app)
+    );
+
+}
+
+
+/* =========================
+   CERRAR EMERGENTE
+========================= */
+
+function closeAppPopup() {
+
+    const popup =
+        document.getElementById(
+            "pkgxAppPopup"
+        );
+
+
+    if (popup) {
+
+        popup.remove();
+
+    }
+
+
+    document.body.classList.remove(
+        "pkgx-popup-open"
+    );
+
+
+    document.removeEventListener(
+        "keydown",
+        popupEscHandler
+    );
+
+
+    /*
+     * Volver a la URL normal
+     */
+
+    if (
+        window.location.search
+    ) {
+
+        history.replaceState(
+            {},
+            "",
+            window.location.pathname
+        );
+
+    }
+
+}
+
+
+function popupEscHandler(event) {
+
+    if (
+        event.key === "Escape"
+    ) {
+
+        closeAppPopup();
+
+    }
+
+}
+
+
+/* =========================
+   ABRIR DESDE URL
+========================= */
+
+function checkSharedApp() {
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    const slug =
+        params.get("app");
+
+
+    if (!slug) {
+
+        return;
+
+    }
+
+
+    const app =
+        apps.find(item => {
+
+            return (
+                createSlug(item.name) ===
+                slug
+            );
+
+        });
+
+
+    if (app) {
+
+        openAppPopupFromUrl(app);
+
+    }
+
+}
+
+
+/*
+ * Igual que el popup normal,
+ * pero no vuelve a modificar la URL.
+ */
+
+function openAppPopupFromUrl(app) {
+
+    closePopupOnly();
+
+
+    const popup =
+        document.createElement("div");
+
+    popup.id =
+        "pkgxAppPopup";
+
+
+    popup.innerHTML = `
+
+        <div class="popup-box">
+
+            <button
+                class="popup-close"
+                type="button"
+            >
+                ×
+            </button>
+
+            <img
+                class="popup-image"
+                src="${app.image || "https://placehold.co/900x500/101722/39ff88?text=PKGX+STORE"}"
+                alt="${app.name || "Aplicación"}"
+            >
+
+            <div class="popup-content">
+
+                <span class="popup-category">
+                    ${app.category || "Otros"}
+                </span>
+
+                <h2>
+                    ${app.name || "Aplicación sin nombre"}
+                </h2>
+
+                <div class="popup-version">
+                    Versión ${app.version || "N/A"}
+                </div>
+
+                <a
+                    class="popup-download"
+                    href="${app.download || "#"}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Descargar
+                </a>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(
+        popup
+    );
+
+
+    document.body.classList.add(
+        "pkgx-popup-open"
+    );
+
+
+    popup
+        .querySelector(".popup-close")
+        .addEventListener(
+            "click",
+            function() {
+
+                closeAppPopup();
+
+            }
+        );
+
+
+    popup.addEventListener(
+        "click",
+        function(event) {
+
+            if (
+                event.target === popup
+            ) {
+
+                closeAppPopup();
+
+            }
+
+        }
+    );
+
+
+    document.addEventListener(
+        "keydown",
+        popupEscHandler
+    );
+
+}
+
+
+function closePopupOnly() {
+
+    const popup =
+        document.getElementById(
+            "pkgxAppPopup"
+        );
+
+
+    if (popup) {
+
+        popup.remove();
+
+    }
 
 }
 
@@ -169,10 +710,6 @@ function renderApps() {
             "app-card";
 
 
-        /* =========================
-           IMAGEN
-        ========================= */
-
         const image =
             document.createElement(
                 "img"
@@ -209,8 +746,7 @@ function renderApps() {
 
 
         /*
-         * Al tocar la imagen
-         * abre la URL de la aplicación
+         * LA IMAGEN ABRE EL EMERGENTE
          */
 
         image.style.cursor =
@@ -219,18 +755,13 @@ function renderApps() {
 
         image.addEventListener(
             "click",
-            () => {
+            function() {
 
-                window.location.href =
-                    getAppUrl(app);
+                openAppPopup(app);
 
             }
         );
 
-
-        /* =========================
-           CONTENIDO
-        ========================= */
 
         const content =
             document.createElement(
@@ -275,10 +806,6 @@ function renderApps() {
         version.textContent =
             `Versión ${app.version || "N/A"}`;
 
-
-        /* =========================
-           BOTÓN DESCARGAR
-        ========================= */
 
         const actions =
             document.createElement(
@@ -340,166 +867,6 @@ function renderApps() {
 
 
 /* =========================
-   MOSTRAR UNA SOLA APP
-========================= */
-
-function showSingleApp(app) {
-
-    /*
-     * Ocultar catálogo completo
-     */
-
-    appsGrid.innerHTML = "";
-
-
-    const card =
-        document.createElement(
-            "article"
-        );
-
-    card.className =
-        "app-card";
-
-
-    /* IMAGEN */
-
-    const image =
-        document.createElement(
-            "img"
-        );
-
-    image.className =
-        "app-image";
-
-
-    image.src =
-        app.image ||
-        "https://placehold.co/900x500/101722/39ff88?text=PKGX+STORE";
-
-
-    image.alt =
-        app.name ||
-        "Aplicación";
-
-
-    image.onerror =
-        function () {
-
-            this.onerror =
-                null;
-
-            this.src =
-                "https://placehold.co/900x500/101722/39ff88?text=PKGX+STORE";
-
-        };
-
-
-    /* CONTENIDO */
-
-    const content =
-        document.createElement(
-            "div"
-        );
-
-    content.className =
-        "app-content";
-
-
-    const categoryTag =
-        document.createElement(
-            "span"
-        );
-
-    categoryTag.className =
-        "category";
-
-    categoryTag.textContent =
-        app.category ||
-        "Otros";
-
-
-    const title =
-        document.createElement(
-            "h2"
-        );
-
-    title.textContent =
-        app.name ||
-        "Aplicación sin nombre";
-
-
-    const version =
-        document.createElement(
-            "div"
-        );
-
-    version.className =
-        "version";
-
-    version.textContent =
-        `Versión ${app.version || "N/A"}`;
-
-
-    /* DESCARGAR */
-
-    const actions =
-        document.createElement(
-            "div"
-        );
-
-    actions.className =
-        "card-actions";
-
-
-    const download =
-        document.createElement(
-            "a"
-        );
-
-    download.className =
-        "btn btn-download";
-
-    download.textContent =
-        "Descargar";
-
-    download.href =
-        app.download ||
-        "#";
-
-    download.target =
-        "_blank";
-
-    download.rel =
-        "noopener noreferrer";
-
-
-    actions.append(
-        download
-    );
-
-
-    content.append(
-        categoryTag,
-        title,
-        version,
-        actions
-    );
-
-
-    card.append(
-        image,
-        content
-    );
-
-
-    appsGrid.appendChild(
-        card
-    );
-
-}
-
-
-/* =========================
    API
 ========================= */
 
@@ -535,52 +902,14 @@ async function loadApps() {
 
         loadCategories();
 
-
-        /*
-         * Revisar si la URL
-         * viene con ?app=
-         */
-
-        const params =
-            new URLSearchParams(
-                window.location.search
-            );
-
-
-        const slug =
-            params.get("app");
-
-
-        if (slug) {
-
-            const app =
-                apps.find(item => {
-
-                    return (
-                        createSlug(item.name) ===
-                        slug
-                    );
-
-                });
-
-
-            if (app) {
-
-                showSingleApp(app);
-
-                return;
-
-            }
-
-        }
-
-
-        /*
-         * Si no hay ?app=
-         * mostrar catálogo normal
-         */
-
         renderApps();
+
+        /*
+         * Si viene ?app=
+         * abrir automáticamente
+         */
+
+        checkSharedApp();
 
 
     } catch (error) {
@@ -613,6 +942,57 @@ searchInput.addEventListener(
 categoryFilter.addEventListener(
     "change",
     renderApps
+);
+
+
+/* =========================
+   ATRÁS / ADELANTE
+========================= */
+
+window.addEventListener(
+    "popstate",
+    function() {
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+        const slug =
+            params.get("app");
+
+
+        if (!slug) {
+
+            closePopupOnly();
+
+            document.body.classList.remove(
+                "pkgx-popup-open"
+            );
+
+            return;
+
+        }
+
+
+        const app =
+            apps.find(item => {
+
+                return (
+                    createSlug(item.name) ===
+                    slug
+                );
+
+            });
+
+
+        if (app) {
+
+            openAppPopupFromUrl(app);
+
+        }
+
+    }
 );
 
 
