@@ -2,284 +2,221 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <title>PKGX Store</title>
 
     <meta
         name="description"
-        content="PKGX Store — catálogo de aplicaciones y herramientas."
+        content="PKGX Store — aplicaciones y herramientas para tu consola."
     >
-
-    <title>PKGX Store</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<header class="header">
+    <header class="header">
 
-    <div class="header-inner">
+        <div class="header-inner">
 
-        <a href="./" class="brand">
-            <span class="brand-name">PKGX</span>
-            <span class="brand-store">STORE</span>
-        </a>
-
-
-        <nav class="nav">
-
-            <a href="#inicio">
-                Inicio
+            <a href="#" class="logo">
+                <span>PKGX</span> STORE
             </a>
 
-            <a href="#apps">
-                Aplicaciones
-            </a>
+            <nav class="nav">
+                <a href="#inicio">Inicio</a>
+                <a href="#apps">Aplicaciones</a>
+            </nav>
 
-        </nav>
+        </div>
 
-    </div>
-
-</header>
-
-
-<main id="inicio">
+    </header>
 
 
-    <!-- HERO -->
+    <main>
 
-    <section class="hero">
+        <!-- HERO -->
 
-        <div class="hero-content">
+        <section class="hero" id="inicio">
 
-            <div class="hero-badge">
-                PKGX STORE
-            </div>
+            <div class="hero-content">
 
-            <h1>
-                Aplicaciones.
-                <br>
-                <span>En un solo lugar.</span>
-            </h1>
-
-            <p>
-                Explora nuestro catálogo de aplicaciones,
-                herramientas y utilidades.
-            </p>
-
-
-            <div class="hero-search">
-
-                <span class="search-icon">
-                    ⌕
+                <span class="hero-label">
+                    PKGX STORE
                 </span>
 
-                <input
-                    id="searchInput"
-                    type="search"
-                    placeholder="Buscar una aplicación..."
-                    autocomplete="off"
-                >
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- CATEGORÍAS -->
-
-    <section class="categories-section">
-
-        <div
-            id="categories"
-            class="categories"
-        >
-
-            <button
-                class="category-button active"
-                data-category="all"
-            >
-                Todas
-            </button>
-
-        </div>
-
-    </section>
-
-
-    <!-- APLICACIONES -->
-
-    <section
-        id="apps"
-        class="catalog-section"
-    >
-
-        <div class="section-header">
-
-            <div>
-
-                <span class="section-label">
-                    CATÁLOGO
-                </span>
-
-                <h2>
-                    Aplicaciones disponibles
-                </h2>
-
-            </div>
-
-
-            <span
-                id="appCount"
-                class="app-count"
-            >
-                0 aplicaciones
-            </span>
-
-        </div>
-
-
-        <div
-            id="appsContainer"
-            class="apps-grid"
-        >
-
-            <div class="state">
-                <div class="loader"></div>
+                <h1>
+                    Aplicaciones.<br>
+                    <span>En un solo lugar.</span>
+                </h1>
 
                 <p>
-                    Cargando aplicaciones...
+                    Descubre aplicaciones, herramientas y utilidades
+                    organizadas de forma sencilla.
                 </p>
+
+                <a href="#apps" class="hero-button">
+                    Explorar aplicaciones
+                </a>
+
             </div>
 
-        </div>
+        </section>
 
 
-        <div
-            id="noResults"
-            class="state hidden"
-        >
+        <!-- APLICACIONES -->
 
-            <div class="empty-icon">
-                ⌕
+        <section class="apps-section" id="apps">
+
+            <div class="section-top">
+
+                <div>
+                    <span class="section-label">
+                        CATÁLOGO
+                    </span>
+
+                    <h2>
+                        Aplicaciones
+                    </h2>
+                </div>
+
+                <div class="search-box">
+
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Buscar aplicación..."
+                        autocomplete="off"
+                    >
+
+                    <button id="searchButton" type="button">
+                        Buscar
+                    </button>
+
+                </div>
+
             </div>
 
-            <h3>
-                No encontramos nada
+
+            <div
+                class="categories"
+                id="categories"
+            ></div>
+
+
+            <div
+                class="apps-grid"
+                id="appsGrid"
+            >
+
+                <div class="loading">
+                    Cargando aplicaciones...
+                </div>
+
+            </div>
+
+
+            <div
+                class="empty"
+                id="emptyState"
+                style="display:none;"
+            >
+
+                <div class="empty-icon">
+                    —
+                </div>
+
+                <h3>
+                    No encontramos aplicaciones
+                </h3>
+
+                <p>
+                    Prueba con otro nombre o categoría.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- MODAL COMPARTIR -->
+
+    <div
+        class="modal"
+        id="shareModal"
+    >
+
+        <div class="modal-overlay" id="modalOverlay"></div>
+
+        <div class="modal-content">
+
+            <button
+                class="modal-close"
+                id="modalClose"
+                type="button"
+            >
+                ×
+            </button>
+
+            <span class="section-label">
+                COMPARTIR
+            </span>
+
+            <h3 id="shareTitle">
+                Compartir aplicación
             </h3>
 
             <p>
-                Prueba con otro nombre o categoría.
+                Comparte el enlace de esta aplicación.
             </p>
 
-        </div>
+            <div class="share-url">
 
-    </section>
+                <input
+                    type="text"
+                    id="shareUrl"
+                    readonly
+                >
 
-</main>
+                <button
+                    id="copyButton"
+                    type="button"
+                >
+                    Copiar
+                </button>
 
-
-<footer class="footer">
-
-    <div class="footer-inner">
-
-        <div>
-
-            <div class="footer-brand">
-                PKGX STORE
             </div>
 
-            <p>
-                Catálogo de aplicaciones y herramientas.
-            </p>
-
-        </div>
-
-
-        <div class="footer-right">
-
-            <span>
-                © 2026 PKGX Store
-            </span>
-
-        </div>
-
-    </div>
-
-</footer>
-
-
-<!-- MODAL COMPARTIR -->
-
-<div
-    id="shareModal"
-    class="modal hidden"
->
-
-    <div
-        class="modal-overlay"
-        id="modalOverlay"
-    ></div>
-
-
-    <div class="modal-box">
-
-        <button
-            id="closeModal"
-            class="modal-close"
-            type="button"
-        >
-            ×
-        </button>
-
-
-        <span class="section-label">
-            COMPARTIR
-        </span>
-
-        <h3 id="shareTitle">
-            Compartir aplicación
-        </h3>
-
-
-        <div class="share-url">
-
-            <input
-                id="shareUrl"
-                type="text"
-                readonly
-            >
-
             <button
-                id="copyButton"
+                class="native-share"
+                id="nativeShare"
                 type="button"
             >
-                Copiar
+                Compartir
             </button>
 
         </div>
 
-
-        <button
-            id="nativeShareButton"
-            class="native-share"
-            type="button"
-        >
-            Compartir
-        </button>
-
     </div>
 
-</div>
+
+    <footer class="footer">
+
+        <div>
+            © 2026 PKGX Store
+        </div>
+
+        <div>
+            Aplicaciones y herramientas
+        </div>
+
+    </footer>
 
 
-<script src="script.js"></script>
+    <script src="script.js"></script>
 
 </body>
 </html>
