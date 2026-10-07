@@ -4,8 +4,8 @@ const categorySelect = document.getElementById("categorySelect");
 
 let apps = [];
 
-// Crear slug para la URL
-function createSlug(text) {
+// Crear slug
+function slugify(text) {
     return String(text)
         .toLowerCase()
         .normalize("NFD")
@@ -14,35 +14,45 @@ function createSlug(text) {
         .replace(/^-+|-+$/g, "");
 }
 
-// Cargar aplicaciones
+// Escapar HTML
+function escapeHtml(text) {
+    return String(text ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+// Cargar aplicaciones desde MongoDB mediante la API
 async function loadApps() {
     try {
         const response = await fetch("/api/apps");
 
         if (!response.ok) {
-            throw new Error("No se pudieron cargar las aplicaciones");
+            throw new Error("Error HTTP " + response.status);
         }
 
         apps = await response.json();
 
         renderApps();
 
-        // Si la URL tiene ?app=..., abrir directamente esa aplicación
+        // Revisar si viene una aplicación en ?app=
         const params = new URLSearchParams(window.location.search);
-        const appSlug = params.get("app");
+        const slug = params.get("app");
 
-        if (appSlug) {
+        if (slug) {
             const app = apps.find(
-                item => createSlug(item.name) === appSlug
+                item => slugify(item.name) === slug
             );
 
             if (app) {
-                openAppDetails(app);
+                openDetails(app, false);
             }
         }
 
     } catch (error) {
-        console.error(error);
+        console.error("Error cargando aplicaciones:", error);
 
         grid.innerHTML = `
             <div class="empty">
@@ -52,39 +62,46 @@ async function loadApps() {
     }
 }
 
-// Renderizar tarjetas
+// Mostrar aplicaciones
 function renderApps() {
-    const search = searchInput.value
-        .toLowerCase()
-        .trim();
 
-    const category = categorySelect.value;
+    const search = searchInput
+        ? searchInput.value.toLowerCase().trim()
+        : "";
+
+    const category = categorySelect
+        ? categorySelect.value
+        : "";
 
     const filtered = apps.filter(app => {
+
+        const name = String(app.name || "").toLowerCase();
+
         const matchesSearch =
-            String(app.name)
-                .toLowerCase()
-                .includes(search);
+            name.includes(search);
 
         const matchesCategory =
             !category ||
-            String(app.category).toLowerCase() ===
+            String(app.category || "").toLowerCase() ===
             category.toLowerCase();
 
         return matchesSearch && matchesCategory;
     });
 
     if (!filtered.length) {
+
         grid.innerHTML = `
             <div class="empty">
                 No se encontraron aplicaciones.
             </div>
         `;
+
         return;
     }
 
     grid.innerHTML = filtered.map(app => {
-        const slug = createSlug(app.name);
+
+        const slug = slugify(app.name);
 
         return `
             <article class="app-card">
@@ -93,8 +110,8 @@ function renderApps() {
                     src="${escapeHtml(app.image)}"
                     alt="${escapeHtml(app.name)}"
                     class="app-image"
+                    onclick="openApp('${slug}')"
                     loading="lazy"
-                    onclick="openAppDetailsBySlug('${slug}')"
                 >
 
                 <div class="app-content">
@@ -123,6 +140,7 @@ function renderApps() {
                         </a>
 
                         <button
+                            type="button"
                             class="share-btn"
                             onclick="shareApp('${slug}')"
                         >
@@ -135,30 +153,32 @@ function renderApps() {
 
             </article>
         `;
+
     }).join("");
 }
 
-// Abrir detalles por slug
-function openAppDetailsBySlug(slug) {
+// Buscar una app y abrir sus detalles
+function openApp(slug) {
+
     const app = apps.find(
-        item => createSlug(item.name) === slug
+        item => slugify(item.name) === slug
     );
 
     if (app) {
-        openAppDetails(app);
+        openDetails(app, true);
     }
 }
 
-// Mostrar detalles de la aplicación
-function openAppDetails(app) {
+// Abrir detalles
+function openDetails(app, changeUrl = true) {
 
-    const oldModal = document.getElementById("appModal");
+    const existing = document.getElementById("appModal");
 
-    if (oldModal) {
-        oldModal.remove();
+    if (existing) {
+        existing.remove();
     }
 
-    const slug = createSlug(app.name);
+    const slug = slugify(app.name);
 
     const modal = document.createElement("div");
 
@@ -166,14 +186,17 @@ function openAppDetails(app) {
     modal.className = "app-modal";
 
     modal.innerHTML = `
-        <div class="app-modal-overlay" onclick="closeAppDetails()"></div>
+        <div
+            class="app-modal-overlay"
+            onclick="closeDetails()"
+        ></div>
 
         <div class="app-modal-content">
 
             <button
+                type="button"
                 class="modal-close"
-                onclick="closeAppDetails()"
-                aria-label="Cerrar"
+                onclick="closeDetails()"
             >
                 ×
             </button>
@@ -210,6 +233,7 @@ function openAppDetails(app) {
                     </a>
 
                     <button
+                        type="button"
                         class="share-btn"
                         onclick="shareApp('${slug}')"
                     >
@@ -227,19 +251,24 @@ function openAppDetails(app) {
 
     document.body.classList.add("modal-open");
 
-    // Actualizar URL sin usar #
-    const newUrl =
-        `${window.location.origin}${window.location.pathname}?app=${encodeURIComponent(slug)}`;
+    // Cambiar URL solamente si venimos desde la página
+    if (changeUrl) {
 
-    window.history.pushState(
-        { app: slug },
-        "",
-        newUrl
-    );
+        const url =
+            window.location.pathname +
+            "?app=" +
+            encodeURIComponent(slug);
+
+        history.pushState(
+            { app: slug },
+            "",
+            url
+        );
+    }
 }
 
 // Cerrar detalles
-function closeAppDetails() {
+function closeDetails() {
 
     const modal = document.getElementById("appModal");
 
@@ -249,28 +278,34 @@ function closeAppDetails() {
 
     document.body.classList.remove("modal-open");
 
-    // Volver a la URL normal
-    window.history.pushState(
+    // Quitar ?app=
+    history.pushState(
         {},
         "",
         window.location.pathname
     );
 }
 
-// Compartir aplicación
+// Compartir
 async function shareApp(slug) {
 
     const app = apps.find(
-        item => createSlug(item.name) === slug
+        item => slugify(item.name) === slug
     );
 
-    if (!app) return;
+    if (!app) {
+        return;
+    }
 
+    // ESTA es la URL que se comparte
     const shareUrl =
-        `${window.location.origin}${window.location.pathname}?app=${encodeURIComponent(slug)}`;
+        window.location.origin +
+        window.location.pathname +
+        "?app=" +
+        encodeURIComponent(slug);
 
-    const shareText =
-        `Seguro te puede interesar esta aplicación:\n${app.name}\n\n${shareUrl}`;
+    const text =
+        `Seguro te puede interesar esta aplicación:\n${app.name}`;
 
     try {
 
@@ -278,7 +313,7 @@ async function shareApp(slug) {
 
             await navigator.share({
                 title: app.name,
-                text: shareText,
+                text: text,
                 url: shareUrl
             });
 
@@ -292,32 +327,23 @@ async function shareApp(slug) {
 
     } catch (error) {
 
-        // El usuario canceló el menú de compartir.
         console.log("Compartir cancelado.");
 
     }
 }
 
-// Cerrar con ESC
-document.addEventListener("keydown", event => {
+// Botón atrás/adelante del navegador
+window.addEventListener("popstate", function () {
 
-    if (event.key === "Escape") {
-        closeAppDetails();
-    }
-
-});
-
-// Si el usuario usa atrás/adelante del navegador
-window.addEventListener("popstate", () => {
-
-    const params = new URLSearchParams(
-        window.location.search
-    );
+    const params =
+        new URLSearchParams(window.location.search);
 
     const slug = params.get("app");
 
     if (!slug) {
-        const modal = document.getElementById("appModal");
+
+        const modal =
+            document.getElementById("appModal");
 
         if (modal) {
             modal.remove();
@@ -329,115 +355,38 @@ window.addEventListener("popstate", () => {
     }
 
     const app = apps.find(
-        item => createSlug(item.name) === slug
+        item => slugify(item.name) === slug
     );
 
     if (app) {
-        openAppDetailsWithoutHistory(app);
+        openDetails(app, false);
+    }
+});
+
+// ESC para cerrar
+document.addEventListener("keydown", function (event) {
+
+    if (event.key === "Escape") {
+        closeDetails();
     }
 
 });
 
-// Abrir detalles sin volver a modificar el historial
-function openAppDetailsWithoutHistory(app) {
-
-    const oldModal = document.getElementById("appModal");
-
-    if (oldModal) {
-        oldModal.remove();
-    }
-
-    const slug = createSlug(app.name);
-
-    const modal = document.createElement("div");
-
-    modal.id = "appModal";
-    modal.className = "app-modal";
-
-    modal.innerHTML = `
-        <div class="app-modal-overlay" onclick="closeAppDetails()"></div>
-
-        <div class="app-modal-content">
-
-            <button
-                class="modal-close"
-                onclick="closeAppDetails()"
-            >
-                ×
-            </button>
-
-            <img
-                src="${escapeHtml(app.image)}"
-                alt="${escapeHtml(app.name)}"
-                class="modal-image"
-            >
-
-            <div class="modal-info">
-
-                <div class="app-category">
-                    ${escapeHtml(app.category)}
-                </div>
-
-                <h2>
-                    ${escapeHtml(app.name)}
-                </h2>
-
-                <div class="modal-version">
-                    Versión ${escapeHtml(app.version)}
-                </div>
-
-                <div class="modal-actions">
-
-                    <a
-                        href="${escapeHtml(app.download)}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="download-btn"
-                    >
-                        Descargar
-                    </a>
-
-                    <button
-                        class="share-btn"
-                        onclick="shareApp('${slug}')"
-                    >
-                        Compartir
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-    `;
-
-    document.body.appendChild(modal);
-
-    document.body.classList.add("modal-open");
+// Eventos de búsqueda
+if (searchInput) {
+    searchInput.addEventListener(
+        "input",
+        renderApps
+    );
 }
 
-// Evitar HTML malicioso en nombres/URLs
-function escapeHtml(value) {
-
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+// Evento de categoría
+if (categorySelect) {
+    categorySelect.addEventListener(
+        "change",
+        renderApps
+    );
 }
-
-// Búsqueda
-searchInput.addEventListener(
-    "input",
-    renderApps
-);
-
-// Categorías
-categorySelect.addEventListener(
-    "change",
-    renderApps
-);
 
 // Iniciar
 loadApps();
