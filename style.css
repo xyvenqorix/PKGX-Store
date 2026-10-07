@@ -1,712 +1,621 @@
-/* =========================
-   PKGX STORE
-   STYLE.CSS
-========================= */
+:root {
+
+    --bg: #070b12;
+    --panel: #101722;
+    --panel-2: #0c121c;
+
+    --text: #f5f7fb;
+    --muted: #9ba8ba;
+
+    --green: #39ff88;
+
+    --border: rgba(255,255,255,.09);
+
+}
+
 
 * {
+
     box-sizing: border-box;
+
     margin: 0;
+
     padding: 0;
+
 }
+
 
 html {
+
     scroll-behavior: smooth;
+
 }
 
+
 body {
-    background: #080b10;
-    color: #e8edf3;
+
     font-family:
-        "Segoe UI",
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
+        "Inter",
         sans-serif;
+
+    color: var(--text);
+
+    background:
+
+        radial-gradient(
+            circle at top left,
+            rgba(57,255,136,.08),
+            transparent 30%
+        ),
+
+        radial-gradient(
+            circle at top right,
+            rgba(67,110,255,.08),
+            transparent 30%
+        ),
+
+        var(--bg);
+
     min-height: 100vh;
+
 }
+
+
+a {
+
+    color: inherit;
+
+    text-decoration: none;
+
+}
+
+
+button,
+input,
+select {
+
+    font: inherit;
+
+}
+
 
 /* =========================
    HEADER
 ========================= */
 
-header {
-    width: 100%;
-    background: #0d1219;
-    border-bottom: 1px solid #202a36;
+.header {
+
     position: sticky;
+
     top: 0;
-    z-index: 100;
-}
 
-.header-inner {
-    max-width: 1200px;
-    margin: auto;
-    padding: 18px 20px;
+    z-index: 20;
 
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
+
     gap: 20px;
+
+    padding: 18px 6%;
+
+    background:
+        rgba(7,11,18,.88);
+
+    backdrop-filter:
+        blur(18px);
+
+    border-bottom:
+        1px solid var(--border);
+
 }
 
-.logo,
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
 
-    color: #ffffff;
-    text-decoration: none;
+.logo {
+
+    font-size: 1.5rem;
+
     font-weight: 800;
-    font-size: 20px;
+
+    letter-spacing: .5px;
+
 }
 
-.logo img,
-.brand img {
-    width: 38px;
-    height: 38px;
-    object-fit: cover;
-    border-radius: 10px;
+
+.logo span {
+
+    color: var(--green);
+
 }
 
-/* =========================
-   CONTENEDOR
-========================= */
 
-main,
-.container {
-    width: min(1200px, calc(100% - 32px));
-    margin: 0 auto;
+.header-links {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 22px;
+
 }
+
+
+.header-links a {
+
+    color: var(--muted);
+
+    font-size: .9rem;
+
+    transition: .2s;
+
+}
+
+
+.header-links a:hover {
+
+    color: var(--green);
+
+}
+
 
 /* =========================
    HERO
 ========================= */
 
 .hero {
-    padding: 45px 0 25px;
-    text-align: center;
+
+    max-width: 1250px;
+
+    margin: auto;
+
+    padding:
+        85px 6% 55px;
+
 }
+
+
+.hero small {
+
+    color: var(--green);
+
+    font-weight: 700;
+
+    letter-spacing: 2px;
+
+    text-transform: uppercase;
+
+}
+
 
 .hero h1 {
-    font-size: clamp(30px, 5vw, 48px);
-    line-height: 1.1;
-    color: #ffffff;
-    margin-bottom: 12px;
+
+    max-width: 850px;
+
+    margin-top: 14px;
+
+    font-size:
+        clamp(2.4rem, 5vw, 4.7rem);
+
+    line-height: 1.04;
+
+    letter-spacing: -2px;
+
 }
+
+
+.hero h1 span {
+
+    color: #6f7b8d;
+
+}
+
 
 .hero p {
-    color: #8e9aaa;
-    font-size: 15px;
+
     max-width: 650px;
-    margin: auto;
+
+    margin-top: 20px;
+
+    color: var(--muted);
+
+    line-height: 1.8;
+
 }
 
-/* =========================
-   CONTROLES
-========================= */
 
-.controls {
-    display: flex;
-    gap: 12px;
-    margin: 20px 0 28px;
-}
+.hero-button {
 
-.search-box,
-#searchInput,
-#categoryFilter {
-    height: 46px;
-    border: 1px solid #263241;
-    background: #10161e;
-    color: #e8edf3;
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    margin-top: 30px;
+
+    min-height: 45px;
+
+    padding: 0 20px;
+
     border-radius: 10px;
-    outline: none;
-    font-family: inherit;
+
+    color: #06100a;
+
+    background: var(--green);
+
+    font-size: .85rem;
+
+    font-weight: 800;
+
+    transition: .2s;
+
 }
 
-#searchInput {
-    flex: 1;
-    width: 100%;
-    padding: 0 15px;
+
+.hero-button:hover {
+
+    transform: translateY(-2px);
+
 }
 
-#categoryFilter {
-    min-width: 210px;
-    padding: 0 12px;
-}
-
-#searchInput::placeholder {
-    color: #667384;
-}
-
-#searchInput:focus,
-#categoryFilter:focus {
-    border-color: #39ff88;
-    box-shadow: 0 0 0 3px rgba(57, 255, 136, 0.08);
-}
 
 /* =========================
-   GRID DE APPS
+   TOOLBAR
 ========================= */
 
-#appsGrid {
-    width: 100%;
+.toolbar {
+
+    max-width: 1250px;
+
+    margin:
+        0 auto 30px;
+
+    padding:
+        0 6%;
+
+    display: flex;
+
+    gap: 12px;
+
+    flex-wrap: wrap;
+
+}
+
+
+.toolbar input,
+.toolbar select {
+
+    min-height: 48px;
+
+    color: var(--text);
+
+    background: var(--panel);
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 12px;
+
+    padding:
+        0 15px;
+
+    outline: none;
+
+}
+
+
+.toolbar input {
+
+    flex: 1;
+
+    min-width: 220px;
+
+}
+
+
+.toolbar input::placeholder {
+
+    color: #6f7b8d;
+
+}
+
+
+.toolbar select {
+
+    min-width: 210px;
+
+}
+
+
+/* =========================
+   GRID
+========================= */
+
+.apps-grid {
+
+    max-width: 1250px;
+
+    margin: auto;
+
+    padding:
+        0 6% 70px;
 
     display: grid;
 
     grid-template-columns:
-        repeat(4, minmax(0, 1fr));
+        repeat(3, minmax(0, 1fr));
 
-    gap: 18px;
+    gap: 24px;
 
-    padding-bottom: 50px;
 }
 
+
 /* =========================
-   TARJETA
+   CARD
 ========================= */
 
 .app-card {
-    min-width: 0;
+
     overflow: hidden;
 
-    background: #10161e;
+    background:
+        linear-gradient(
+            145deg,
+            var(--panel),
+            var(--panel-2)
+        );
 
-    border: 1px solid #202b38;
+    border:
+        1px solid var(--border);
 
-    border-radius: 14px;
+    border-radius: 18px;
 
     transition:
-        transform 0.2s ease,
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
+        transform .25s,
+        border-color .25s;
 
-    box-shadow:
-        0 8px 30px rgba(0, 0, 0, 0.18);
 }
+
 
 .app-card:hover {
-    transform: translateY(-3px);
 
-    border-color: #344352;
+    transform:
+        translateY(-6px);
 
-    box-shadow:
-        0 14px 35px rgba(0, 0, 0, 0.28);
+    border-color:
+        rgba(57,255,136,.45);
+
 }
 
-/* =========================
-   IMAGEN
-========================= */
 
 .app-image {
-    display: block;
 
     width: 100%;
 
-    aspect-ratio: 16 / 9;
+    height: 225px;
+
+    display: block;
 
     object-fit: cover;
 
-    background: #0d131b;
+    background:
+        #151d29;
 
-    cursor: pointer;
-
-    transition:
-        opacity 0.2s ease,
-        transform 0.2s ease;
 }
 
-.app-image:hover {
-    opacity: 0.88;
-}
-
-/* =========================
-   CONTENIDO
-========================= */
 
 .app-content {
-    padding: 15px;
+
+    padding: 20px;
+
 }
+
 
 .category {
+
     display: inline-block;
 
-    color: #39ff88;
+    margin-bottom: 10px;
+
+    padding:
+        5px 9px;
+
+    color: var(--green);
 
     background:
-        rgba(57, 255, 136, 0.08);
+        rgba(57,255,136,.09);
 
     border:
-        1px solid rgba(57, 255, 136, 0.16);
+        1px solid
+        rgba(57,255,136,.2);
 
-    border-radius: 999px;
+    border-radius: 7px;
 
-    padding: 4px 9px;
-
-    font-size: 11px;
-
-    margin-bottom: 9px;
-}
-
-.app-content h2 {
-    color: #ffffff;
-
-    font-size: 17px;
-
-    line-height: 1.3;
-
-    margin-bottom: 7px;
-
-    word-break: break-word;
-}
-
-.version {
-    color: #7e8a99;
-
-    font-size: 13px;
-
-    margin-bottom: 14px;
-}
-
-/* =========================
-   BOTONES
-========================= */
-
-.card-actions {
-    display: flex;
-
-    width: 100%;
-}
-
-.btn {
-    display: inline-flex;
-
-    align-items: center;
-    justify-content: center;
-
-    min-height: 40px;
-
-    padding: 9px 13px;
-
-    border-radius: 9px;
-
-    text-decoration: none;
-
-    font-family: inherit;
-
-    font-size: 13px;
+    font-size: .72rem;
 
     font-weight: 700;
 
+}
+
+
+.app-content h2 {
+
+    font-size: 1.15rem;
+
+    margin-bottom: 5px;
+
+}
+
+
+.version {
+
+    color: var(--muted);
+
+    font-size: .78rem;
+
+}
+
+
+.card-actions {
+
+    display: flex;
+
+    gap: 9px;
+
+    margin-top: 18px;
+
+}
+
+
+.btn {
+
+    flex: 1;
+
+    min-height: 42px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 10px;
+
+    border:
+        1px solid var(--border);
+
     cursor: pointer;
 
-    transition:
-        opacity 0.2s ease,
-        transform 0.2s ease;
+    font-size: .85rem;
+
+    font-weight: 700;
+
 }
 
-.btn:hover {
-    opacity: 0.88;
-
-    transform: translateY(-1px);
-}
 
 .btn-download {
-    width: 100%;
 
-    background: #39ff88;
+    color: #06100a;
 
-    color: #07110b;
+    background: var(--green);
+
 }
 
+
+.btn-share {
+
+    color: var(--text);
+
+    background: #182231;
+
+}
+
+
 /* =========================
-   VACÍO
+   ESTADOS
 ========================= */
 
-.empty {
-    grid-column: 1 / -1;
+.empty,
+.loading {
 
-    padding: 50px 20px;
+    grid-column:
+        1 / -1;
+
+    padding:
+        50px 20px;
+
+    color:
+        var(--muted);
 
     text-align: center;
 
-    color: #7e8a99;
-
-    background: #10161e;
-
-    border: 1px solid #202b38;
-
-    border-radius: 14px;
 }
+
 
 /* =========================
    FOOTER
 ========================= */
 
-footer {
-    border-top: 1px solid #202a36;
+.footer {
 
-    background: #0d1219;
+    padding:
+        25px 6%;
 
-    color: #697686;
+    color:
+        var(--muted);
 
-    text-align: center;
+    text-align:
+        center;
 
-    padding: 22px 15px;
+    border-top:
+        1px solid var(--border);
 
-    font-size: 13px;
+    font-size:
+        .85rem;
+
 }
 
-footer a {
-    color: #39ff88;
-
-    text-decoration: none;
-}
-
-footer a:hover {
-    text-decoration: underline;
-}
 
 /* =========================
-   EMERGENTE DE APP
+   RESPONSIVE
 ========================= */
 
-#pkgxAppPopup {
-    position: fixed;
+@media (max-width: 900px) {
 
-    inset: 0;
+    .apps-grid {
 
-    z-index: 999999;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    padding: 20px;
-
-    background:
-        rgba(0, 0, 0, 0.82);
-
-    backdrop-filter: blur(8px);
-}
-
-#pkgxAppPopup .popup-box {
-    position: relative;
-
-    width: min(430px, 100%);
-
-    max-height: 90vh;
-
-    overflow-y: auto;
-
-    background: #101722;
-
-    border: 1px solid #263242;
-
-    border-radius: 18px;
-
-    overflow: hidden;
-
-    box-shadow:
-        0 25px 80px rgba(0, 0, 0, 0.65);
-
-    animation:
-        pkgxPopupIn 0.18s ease-out;
-}
-
-@keyframes pkgxPopupIn {
-
-    from {
-        opacity: 0;
-        transform: scale(0.96) translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
-
-}
-
-#pkgxAppPopup .popup-image {
-    display: block;
-
-    width: 100%;
-
-    max-height: 330px;
-
-    object-fit: cover;
-}
-
-#pkgxAppPopup .popup-content {
-    padding: 20px;
-}
-
-#pkgxAppPopup .popup-category {
-    display: inline-block;
-
-    padding: 5px 10px;
-
-    margin-bottom: 10px;
-
-    border-radius: 999px;
-
-    background:
-        rgba(57, 255, 136, 0.10);
-
-    border:
-        1px solid rgba(57, 255, 136, 0.15);
-
-    color: #39ff88;
-
-    font-size: 12px;
-}
-
-#pkgxAppPopup h2 {
-    margin: 0 0 8px;
-
-    color: #ffffff;
-
-    font-size: 24px;
-
-    line-height: 1.25;
-
-    word-break: break-word;
-}
-
-#pkgxAppPopup .popup-version {
-    color: #9da8b7;
-
-    font-size: 14px;
-
-    margin-bottom: 20px;
-}
-
-#pkgxAppPopup .popup-download {
-    display: block;
-
-    width: 100%;
-
-    padding: 12px 16px;
-
-    box-sizing: border-box;
-
-    text-align: center;
-
-    text-decoration: none;
-
-    border-radius: 10px;
-
-    background: #39ff88;
-
-    color: #07100b;
-
-    font-weight: 800;
-
-    transition:
-        opacity 0.2s ease,
-        transform 0.2s ease;
-}
-
-#pkgxAppPopup .popup-download:hover {
-    opacity: 0.88;
-
-    transform: translateY(-1px);
-}
-
-#pkgxAppPopup .popup-close {
-    position: absolute;
-
-    top: 12px;
-
-    right: 12px;
-
-    z-index: 5;
-
-    width: 38px;
-
-    height: 38px;
-
-    padding: 0;
-
-    border: 0;
-
-    border-radius: 50%;
-
-    background:
-        rgba(0, 0, 0, 0.70);
-
-    color: #ffffff;
-
-    font-size: 24px;
-
-    line-height: 38px;
-
-    text-align: center;
-
-    cursor: pointer;
-
-    transition:
-        background 0.2s ease,
-        transform 0.2s ease;
-}
-
-#pkgxAppPopup .popup-close:hover {
-    background:
-        rgba(0, 0, 0, 0.9);
-
-    transform: scale(1.05);
-}
-
-body.pkgx-popup-open {
-    overflow: hidden;
-}
-
-/* =========================
-   TABLET
-========================= */
-
-@media (max-width: 1100px) {
-
-    #appsGrid {
         grid-template-columns:
-            repeat(3, minmax(0, 1fr));
+            repeat(2, minmax(0, 1fr));
 
-        gap: 16px;
     }
 
 }
 
-/* =========================
-   MÓVIL
-========================= */
 
-@media (max-width: 700px) {
+@media (max-width: 600px) {
 
-    main,
-    .container {
-        width:
-            min(
-                100% - 22px,
-                1200px
-            );
+    .header {
+
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+
     }
 
-    .header-inner {
-        padding: 14px 12px;
+
+    .apps-grid {
+
+        grid-template-columns:
+            1fr;
+
     }
+
+
+    .app-image {
+
+        height:
+            240px;
+
+    }
+
 
     .hero {
-        padding: 32px 0 20px;
+
+        padding-top:
+            60px;
+
     }
+
 
     .hero h1 {
-        font-size: 30px;
-    }
 
-    .controls {
-        flex-direction: column;
-    }
+        letter-spacing:
+            -1px;
 
-    #categoryFilter {
-        width: 100%;
-        min-width: 0;
-    }
-
-    #appsGrid {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-
-        gap: 12px;
-    }
-
-    .app-content {
-        padding: 11px;
-    }
-
-    .app-content h2 {
-        font-size: 14px;
-    }
-
-    .version {
-        font-size: 12px;
-        margin-bottom: 10px;
-    }
-
-    .category {
-        font-size: 10px;
-        padding: 4px 7px;
-    }
-
-    .btn {
-        min-height: 37px;
-        padding: 8px 10px;
-        font-size: 12px;
-    }
-
-}
-
-/* =========================
-   MÓVILES PEQUEÑOS
-========================= */
-
-@media (max-width: 420px) {
-
-    #appsGrid {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-
-        gap: 9px;
-    }
-
-    .app-content {
-        padding: 9px;
-    }
-
-    .app-content h2 {
-        font-size: 13px;
-    }
-
-    .version {
-        font-size: 11px;
-    }
-
-    .btn {
-        font-size: 11px;
-        min-height: 35px;
-    }
-
-    #pkgxAppPopup {
-        padding: 12px;
-    }
-
-    #pkgxAppPopup .popup-box {
-        border-radius: 15px;
-    }
-
-    #pkgxAppPopup .popup-content {
-        padding: 16px;
-    }
-
-    #pkgxAppPopup h2 {
-        font-size: 21px;
-    }
-
-}
-
-/* =========================
-   PANTALLAS MUY GRANDES
-========================= */
-
-@media (min-width: 1400px) {
-
-    #appsGrid {
-        grid-template-columns:
-            repeat(4, minmax(0, 1fr));
-
-        gap: 20px;
     }
 
 }
