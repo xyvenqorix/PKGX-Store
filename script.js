@@ -1,392 +1,510 @@
-const grid = document.getElementById("appsGrid");
-const searchInput = document.getElementById("searchInput");
-const categorySelect = document.getElementById("categorySelect");
+const appsGrid =
+    document.getElementById("appsGrid");
+
+const searchInput =
+    document.getElementById("searchInput");
+
+const categoryFilter =
+    document.getElementById("categoryFilter");
+
 
 let apps = [];
 
-// Crear slug
-function slugify(text) {
-    return String(text)
+
+/* =========================
+   SLUG
+========================= */
+
+function createSlug(name) {
+
+    return String(name || "")
         .toLowerCase()
         .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "");
+        .replace(
+            /[\u0300-\u036f]/g,
+            ""
+        )
+        .replace(
+            /[^a-z0-9]+/g,
+            "-"
+        )
+        .replace(
+            /^-|-$/g,
+            "");
+
 }
 
-// Escapar HTML
-function escapeHtml(text) {
-    return String(text ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+
+/* =========================
+   URL
+========================= */
+
+function getAppUrl(app) {
+
+    return `${window.location.origin}${window.location.pathname}#${createSlug(app.name)}`;
+
 }
 
-// Cargar aplicaciones desde MongoDB mediante la API
-async function loadApps() {
-    try {
-        const response = await fetch("/api/apps");
 
-        if (!response.ok) {
-            throw new Error("Error HTTP " + response.status);
-        }
+/* =========================
+   COMPARTIR
+========================= */
 
-        apps = await response.json();
+function shareApp(app) {
 
-        renderApps();
+    const appUrl =
+        getAppUrl(app);
 
-        // Revisar si viene una aplicación en ?app=
-        const params = new URLSearchParams(window.location.search);
-        const slug = params.get("app");
 
-        if (slug) {
-            const app = apps.find(
-                item => slugify(item.name) === slug
+    const message =
+        `Seguro te puede interesar esta aplicación:\n` +
+        `${appUrl}`;
+
+
+    if (navigator.share) {
+
+        navigator.share({
+
+            title:
+                app.name,
+
+            text:
+                message,
+
+            url:
+                appUrl
+
+        }).catch(() => {});
+
+    } else if (navigator.clipboard) {
+
+        navigator.clipboard
+            .writeText(message)
+            .then(() => {
+
+                alert(
+                    "Enlace copiado para compartir."
+                );
+
+            });
+
+    } else {
+
+        prompt(
+            "Copia este mensaje:",
+            message
+        );
+
+    }
+
+}
+
+
+/* =========================
+   PLATAFORMAS / CATEGORÍAS
+========================= */
+
+function loadCategories() {
+
+    const categories = [
+        ...new Set(
+            apps
+                .map(app => app.category)
+                .filter(Boolean)
+        )
+    ].sort();
+
+
+    categoryFilter.innerHTML = `
+        <option value="">
+            Todas las categorías
+        </option>
+    `;
+
+
+    categories.forEach(category => {
+
+        const option =
+            document.createElement(
+                "option"
             );
 
-            if (app) {
-                openDetails(app, false);
-            }
-        }
+        option.value =
+            category;
 
-    } catch (error) {
-        console.error("Error cargando aplicaciones:", error);
+        option.textContent =
+            category;
 
-        grid.innerHTML = `
-            <div class="empty">
-                No se pudieron cargar las aplicaciones.
-            </div>
-        `;
-    }
+        categoryFilter.appendChild(
+            option
+        );
+
+    });
+
 }
 
-// Mostrar aplicaciones
+
+/* =========================
+   RENDER
+========================= */
+
 function renderApps() {
 
-    const search = searchInput
-        ? searchInput.value.toLowerCase().trim()
-        : "";
+    const search =
+        searchInput.value
+            .toLowerCase()
+            .trim();
 
-    const category = categorySelect
-        ? categorySelect.value
-        : "";
 
-    const filtered = apps.filter(app => {
+    const category =
+        categoryFilter.value;
 
-        const name = String(app.name || "").toLowerCase();
 
-        const matchesSearch =
-            name.includes(search);
+    const filtered =
+        apps.filter(app => {
 
-        const matchesCategory =
-            !category ||
-            String(app.category || "").toLowerCase() ===
-            category.toLowerCase();
+            const name =
+                String(
+                    app.name || ""
+                ).toLowerCase();
 
-        return matchesSearch && matchesCategory;
-    });
+
+            const appCategory =
+                String(
+                    app.category || ""
+                );
+
+
+            return (
+
+                name.includes(search) &&
+
+                (
+                    !category ||
+                    appCategory === category
+                )
+
+            );
+
+        });
+
+
+    appsGrid.innerHTML = "";
+
 
     if (!filtered.length) {
 
-        grid.innerHTML = `
+        appsGrid.innerHTML = `
             <div class="empty">
                 No se encontraron aplicaciones.
             </div>
         `;
 
         return;
+
     }
 
-    grid.innerHTML = filtered.map(app => {
 
-        const slug = slugify(app.name);
+    filtered.forEach(app => {
 
-        return `
-            <article class="app-card">
+        const card =
+            document.createElement(
+                "article"
+            );
 
-                <img
-                    src="${escapeHtml(app.image)}"
-                    alt="${escapeHtml(app.name)}"
-                    class="app-image"
-                    onclick="openApp('${slug}')"
-                    loading="lazy"
-                >
+        card.className =
+            "app-card";
 
-                <div class="app-content">
 
-                    <div class="app-category">
-                        ${escapeHtml(app.category)}
-                    </div>
+        const image =
+            document.createElement(
+                "img"
+            );
 
-                    <h3>
-                        ${escapeHtml(app.name)}
-                    </h3>
+        image.className =
+            "app-image";
 
-                    <div class="app-version">
-                        Versión ${escapeHtml(app.version)}
-                    </div>
 
-                    <div class="app-actions">
+        image.src =
+            app.image ||
+            "https://placehold.co/900x500/101722/39ff88?text=PKGX+STORE";
 
-                        <a
-                            href="${escapeHtml(app.download)}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="download-btn"
-                        >
-                            Descargar
-                        </a>
 
-                        <button
-                            type="button"
-                            class="share-btn"
-                            onclick="shareApp('${slug}')"
-                        >
-                            Compartir
-                        </button>
+        image.alt =
+            app.name ||
+            "Aplicación";
 
-                    </div>
 
-                </div>
+        image.loading =
+            "lazy";
 
-            </article>
-        `;
 
-    }).join("");
-}
+        image.onerror =
+            function () {
 
-// Buscar una app y abrir sus detalles
-function openApp(slug) {
+                this.onerror =
+                    null;
 
-    const app = apps.find(
-        item => slugify(item.name) === slug
-    );
+                this.src =
+                    "https://placehold.co/900x500/101722/39ff88?text=PKGX+STORE";
 
-    if (app) {
-        openDetails(app, true);
-    }
-}
+            };
 
-// Abrir detalles
-function openDetails(app, changeUrl = true) {
 
-    const existing = document.getElementById("appModal");
+        const content =
+            document.createElement(
+                "div"
+            );
 
-    if (existing) {
-        existing.remove();
-    }
+        content.className =
+            "app-content";
 
-    const slug = slugify(app.name);
 
-    const modal = document.createElement("div");
+        const categoryTag =
+            document.createElement(
+                "span"
+            );
 
-    modal.id = "appModal";
-    modal.className = "app-modal";
+        categoryTag.className =
+            "category";
 
-    modal.innerHTML = `
-        <div
-            class="app-modal-overlay"
-            onclick="closeDetails()"
-        ></div>
+        categoryTag.textContent =
+            app.category ||
+            "Otros";
 
-        <div class="app-modal-content">
 
-            <button
-                type="button"
-                class="modal-close"
-                onclick="closeDetails()"
-            >
-                ×
-            </button>
+        const title =
+            document.createElement(
+                "h2"
+            );
 
-            <img
-                src="${escapeHtml(app.image)}"
-                alt="${escapeHtml(app.name)}"
-                class="modal-image"
-            >
+        title.textContent =
+            app.name ||
+            "Aplicación sin nombre";
 
-            <div class="modal-info">
 
-                <div class="app-category">
-                    ${escapeHtml(app.category)}
-                </div>
+        const version =
+            document.createElement(
+                "div"
+            );
 
-                <h2>
-                    ${escapeHtml(app.name)}
-                </h2>
+        version.className =
+            "version";
 
-                <div class="modal-version">
-                    Versión ${escapeHtml(app.version)}
-                </div>
+        version.textContent =
+            `Versión ${app.version || "N/A"}`;
 
-                <div class="modal-actions">
 
-                    <a
-                        href="${escapeHtml(app.download)}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="download-btn"
-                    >
-                        Descargar
-                    </a>
+        const actions =
+            document.createElement(
+                "div"
+            );
 
-                    <button
-                        type="button"
-                        class="share-btn"
-                        onclick="shareApp('${slug}')"
-                    >
-                        Compartir
-                    </button>
+        actions.className =
+            "card-actions";
 
-                </div>
 
-            </div>
+        const download =
+            document.createElement(
+                "a"
+            );
 
-        </div>
-    `;
+        download.className =
+            "btn btn-download";
 
-    document.body.appendChild(modal);
+        download.textContent =
+            "Descargar";
 
-    document.body.classList.add("modal-open");
+        download.href =
+            app.download ||
+            "#";
 
-    // Cambiar URL solamente si venimos desde la página
-    if (changeUrl) {
+        download.target =
+            "_blank";
 
-        const url =
-            window.location.pathname +
-            "?app=" +
-            encodeURIComponent(slug);
+        download.rel =
+            "noopener noreferrer";
 
-        history.pushState(
-            { app: slug },
-            "",
-            url
+
+        const share =
+            document.createElement(
+                "button"
+            );
+
+        share.className =
+            "btn btn-share";
+
+        share.type =
+            "button";
+
+        share.textContent =
+            "Compartir";
+
+
+        share.addEventListener(
+            "click",
+            () => {
+
+                shareApp(app);
+
+            }
         );
-    }
+
+
+        actions.append(
+            download,
+            share
+        );
+
+
+        content.append(
+            categoryTag,
+            title,
+            version,
+            actions
+        );
+
+
+        card.append(
+            image,
+            content
+        );
+
+
+        appsGrid.appendChild(
+            card
+        );
+
+    });
+
 }
 
-// Cerrar detalles
-function closeDetails() {
 
-    const modal = document.getElementById("appModal");
+/* =========================
+   API
+========================= */
 
-    if (modal) {
-        modal.remove();
-    }
-
-    document.body.classList.remove("modal-open");
-
-    // Quitar ?app=
-    history.pushState(
-        {},
-        "",
-        window.location.pathname
-    );
-}
-
-// Compartir
-async function shareApp(slug) {
-
-    const app = apps.find(
-        item => slugify(item.name) === slug
-    );
-
-    if (!app) {
-        return;
-    }
-
-    // ESTA es la URL que se comparte
-    const shareUrl =
-        window.location.origin +
-        window.location.pathname +
-        "?app=" +
-        encodeURIComponent(slug);
-
-    const text =
-        `Seguro te puede interesar esta aplicación:\n${app.name}`;
+async function loadApps() {
 
     try {
 
-        if (navigator.share) {
+        const response =
+            await fetch(
+                "/api/apps"
+            );
 
-            await navigator.share({
-                title: app.name,
-                text: text,
-                url: shareUrl
-            });
 
-        } else {
+        if (!response.ok) {
 
-            await navigator.clipboard.writeText(shareUrl);
-
-            alert("Enlace copiado correctamente.");
+            throw new Error(
+                "No se pudieron cargar las aplicaciones"
+            );
 
         }
+
+
+        apps =
+            await response.json();
+
+
+        if (!Array.isArray(apps)) {
+
+            apps = [];
+
+        }
+
+
+        loadCategories();
+
+        renderApps();
+
+        checkHash();
+
 
     } catch (error) {
 
-        console.log("Compartir cancelado.");
+        console.error(error);
+
+
+        appsGrid.innerHTML = `
+            <div class="empty">
+                No se pudieron cargar las aplicaciones.
+                Intenta nuevamente.
+            </div>
+        `;
 
     }
+
 }
 
-// Botón atrás/adelante del navegador
-window.addEventListener("popstate", function () {
 
-    const params =
-        new URLSearchParams(window.location.search);
+/* =========================
+   HASH
+========================= */
 
-    const slug = params.get("app");
+function checkHash() {
+
+    const slug =
+        window.location.hash
+            .replace("#", "")
+            .trim();
+
 
     if (!slug) {
 
-        const modal =
-            document.getElementById("appModal");
-
-        if (modal) {
-            modal.remove();
-        }
-
-        document.body.classList.remove("modal-open");
-
         return;
+
     }
 
-    const app = apps.find(
-        item => slugify(item.name) === slug
-    );
+
+    const app =
+        apps.find(item => {
+
+            return (
+                createSlug(item.name) ===
+                slug
+            );
+
+        });
+
 
     if (app) {
-        openDetails(app, false);
-    }
-});
 
-// ESC para cerrar
-document.addEventListener("keydown", function (event) {
+        document
+            .getElementById("apps")
+            .scrollIntoView({
+                behavior: "smooth"
+            });
 
-    if (event.key === "Escape") {
-        closeDetails();
     }
 
-});
-
-// Eventos de búsqueda
-if (searchInput) {
-    searchInput.addEventListener(
-        "input",
-        renderApps
-    );
 }
 
-// Evento de categoría
-if (categorySelect) {
-    categorySelect.addEventListener(
-        "change",
-        renderApps
-    );
-}
 
-// Iniciar
+/* =========================
+   EVENTOS
+========================= */
+
+searchInput.addEventListener(
+    "input",
+    renderApps
+);
+
+
+categoryFilter.addEventListener(
+    "change",
+    renderApps
+);
+
+
+window.addEventListener(
+    "hashchange",
+    checkHash
+);
+
+
+/* =========================
+   INICIAR
+========================= */
+
 loadApps();
