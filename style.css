@@ -1,621 +1,72 @@
-:root {
-
-    --bg: #070b12;
-    --panel: #101722;
-    --panel-2: #0c121c;
-
-    --text: #f5f7fb;
-    --muted: #9ba8ba;
-
-    --green: #39ff88;
-
-    --border: rgba(255,255,255,.09);
-
-}
-
-
-* {
-
-    box-sizing: border-box;
-
-    margin: 0;
-
-    padding: 0;
-
-}
-
-
-html {
-
-    scroll-behavior: smooth;
-
-}
-
-
-body {
-
-    font-family:
-        "Inter",
-        sans-serif;
-
-    color: var(--text);
-
-    background:
-
-        radial-gradient(
-            circle at top left,
-            rgba(57,255,136,.08),
-            transparent 30%
-        ),
-
-        radial-gradient(
-            circle at top right,
-            rgba(67,110,255,.08),
-            transparent 30%
-        ),
-
-        var(--bg);
-
-    min-height: 100vh;
-
-}
-
-
-a {
-
-    color: inherit;
-
-    text-decoration: none;
-
-}
-
-
-button,
-input,
-select {
-
-    font: inherit;
-
-}
-
-
 /* =========================
-   HEADER
+   GRID RESPONSIVE
 ========================= */
 
-.header {
-
-    position: sticky;
-
-    top: 0;
-
-    z-index: 20;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    gap: 20px;
-
-    padding: 18px 6%;
-
-    background:
-        rgba(7,11,18,.88);
-
-    backdrop-filter:
-        blur(18px);
-
-    border-bottom:
-        1px solid var(--border);
-
-}
-
-
-.logo {
-
-    font-size: 1.5rem;
-
-    font-weight: 800;
-
-    letter-spacing: .5px;
-
-}
-
-
-.logo span {
-
-    color: var(--green);
-
-}
-
-
-.header-links {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 22px;
-
-}
-
-
-.header-links a {
-
-    color: var(--muted);
-
-    font-size: .9rem;
-
-    transition: .2s;
-
-}
-
-
-.header-links a:hover {
-
-    color: var(--green);
-
-}
-
-
-/* =========================
-   HERO
-========================= */
-
-.hero {
-
-    max-width: 1250px;
-
-    margin: auto;
-
-    padding:
-        85px 6% 55px;
-
-}
-
-
-.hero small {
-
-    color: var(--green);
-
-    font-weight: 700;
-
-    letter-spacing: 2px;
-
-    text-transform: uppercase;
-
-}
-
-
-.hero h1 {
-
-    max-width: 850px;
-
-    margin-top: 14px;
-
-    font-size:
-        clamp(2.4rem, 5vw, 4.7rem);
-
-    line-height: 1.04;
-
-    letter-spacing: -2px;
-
-}
-
-
-.hero h1 span {
-
-    color: #6f7b8d;
-
-}
-
-
-.hero p {
-
-    max-width: 650px;
-
-    margin-top: 20px;
-
-    color: var(--muted);
-
-    line-height: 1.8;
-
-}
-
-
-.hero-button {
-
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    margin-top: 30px;
-
-    min-height: 45px;
-
-    padding: 0 20px;
-
-    border-radius: 10px;
-
-    color: #06100a;
-
-    background: var(--green);
-
-    font-size: .85rem;
-
-    font-weight: 800;
-
-    transition: .2s;
-
-}
-
-
-.hero-button:hover {
-
-    transform: translateY(-2px);
-
-}
-
-
-/* =========================
-   TOOLBAR
-========================= */
-
-.toolbar {
-
-    max-width: 1250px;
-
-    margin:
-        0 auto 30px;
-
-    padding:
-        0 6%;
-
-    display: flex;
-
-    gap: 12px;
-
-    flex-wrap: wrap;
-
-}
-
-
-.toolbar input,
-.toolbar select {
-
-    min-height: 48px;
-
-    color: var(--text);
-
-    background: var(--panel);
-
-    border:
-        1px solid var(--border);
-
-    border-radius: 12px;
-
-    padding:
-        0 15px;
-
-    outline: none;
-
-}
-
-
-.toolbar input {
-
-    flex: 1;
-
-    min-width: 220px;
-
-}
-
-
-.toolbar input::placeholder {
-
-    color: #6f7b8d;
-
-}
-
-
-.toolbar select {
-
-    min-width: 210px;
-
-}
-
-
-/* =========================
-   GRID
-========================= */
-
-.apps-grid {
-
-    max-width: 1250px;
-
-    margin: auto;
-
-    padding:
-        0 6% 70px;
-
+#appsGrid {
     display: grid;
-
-    grid-template-columns:
-        repeat(3, minmax(0, 1fr));
-
-    gap: 24px;
-
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(180px, 1fr)
+    );
+    gap: 18px;
 }
 
 
-/* =========================
-   CARD
-========================= */
+/* Móviles pequeños */
 
-.app-card {
+@media (max-width: 420px) {
 
-    overflow: hidden;
-
-    background:
-        linear-gradient(
-            145deg,
-            var(--panel),
-            var(--panel-2)
+    #appsGrid {
+        grid-template-columns: repeat(
+            2,
+            minmax(0, 1fr)
         );
 
-    border:
-        1px solid var(--border);
-
-    border-radius: 18px;
-
-    transition:
-        transform .25s,
-        border-color .25s;
-
-}
-
-
-.app-card:hover {
-
-    transform:
-        translateY(-6px);
-
-    border-color:
-        rgba(57,255,136,.45);
-
-}
-
-
-.app-image {
-
-    width: 100%;
-
-    height: 225px;
-
-    display: block;
-
-    object-fit: cover;
-
-    background:
-        #151d29;
-
-}
-
-
-.app-content {
-
-    padding: 20px;
-
-}
-
-
-.category {
-
-    display: inline-block;
-
-    margin-bottom: 10px;
-
-    padding:
-        5px 9px;
-
-    color: var(--green);
-
-    background:
-        rgba(57,255,136,.09);
-
-    border:
-        1px solid
-        rgba(57,255,136,.2);
-
-    border-radius: 7px;
-
-    font-size: .72rem;
-
-    font-weight: 700;
-
-}
-
-
-.app-content h2 {
-
-    font-size: 1.15rem;
-
-    margin-bottom: 5px;
-
-}
-
-
-.version {
-
-    color: var(--muted);
-
-    font-size: .78rem;
-
-}
-
-
-.card-actions {
-
-    display: flex;
-
-    gap: 9px;
-
-    margin-top: 18px;
-
-}
-
-
-.btn {
-
-    flex: 1;
-
-    min-height: 42px;
-
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    border-radius: 10px;
-
-    border:
-        1px solid var(--border);
-
-    cursor: pointer;
-
-    font-size: .85rem;
-
-    font-weight: 700;
-
-}
-
-
-.btn-download {
-
-    color: #06100a;
-
-    background: var(--green);
-
-}
-
-
-.btn-share {
-
-    color: var(--text);
-
-    background: #182231;
-
-}
-
-
-/* =========================
-   ESTADOS
-========================= */
-
-.empty,
-.loading {
-
-    grid-column:
-        1 / -1;
-
-    padding:
-        50px 20px;
-
-    color:
-        var(--muted);
-
-    text-align: center;
-
-}
-
-
-/* =========================
-   FOOTER
-========================= */
-
-.footer {
-
-    padding:
-        25px 6%;
-
-    color:
-        var(--muted);
-
-    text-align:
-        center;
-
-    border-top:
-        1px solid var(--border);
-
-    font-size:
-        .85rem;
-
-}
-
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width: 900px) {
-
-    .apps-grid {
-
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-
+        gap: 12px;
     }
 
 }
 
 
-@media (max-width: 600px) {
+/* Móviles normales */
 
-    .header {
+@media (min-width: 421px) and (max-width: 700px) {
 
-        align-items:
-            flex-start;
+    #appsGrid {
+        grid-template-columns: repeat(
+            2,
+            minmax(0, 1fr)
+        );
 
-        flex-direction:
-            column;
-
+        gap: 14px;
     }
 
+}
 
-    .apps-grid {
 
-        grid-template-columns:
-            1fr;
+/* Pantallas medianas */
 
+@media (min-width: 701px) and (max-width: 1100px) {
+
+    #appsGrid {
+        grid-template-columns: repeat(
+            3,
+            minmax(0, 1fr)
+        );
     }
 
-
-    .app-image {
-
-        height:
-            240px;
-
-    }
+}
 
 
-    .hero {
+/* PC grande */
 
-        padding-top:
-            60px;
+@media (min-width: 1101px) {
 
-    }
-
-
-    .hero h1 {
-
-        letter-spacing:
-            -1px;
-
+    #appsGrid {
+        grid-template-columns: repeat(
+            4,
+            minmax(0, 1fr)
+        );
     }
 
 }
