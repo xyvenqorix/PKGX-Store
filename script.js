@@ -41,7 +41,7 @@ function createSlug(name) {
 
 function getAppUrl(app) {
 
-    return `${window.location.origin}${window.location.pathname}#${createSlug(app.name)}`;
+    return `${window.location.origin}${window.location.pathname}?app=${encodeURIComponent(createSlug(app.name))}`;
 
 }
 
@@ -418,7 +418,7 @@ async function loadApps() {
 
         renderApps();
 
-        checkHash();
+        checkSharedApp();
 
 
     } catch (error) {
@@ -434,6 +434,182 @@ async function loadApps() {
         `;
 
     }
+
+}
+
+
+/* =========================
+   APP COMPARTIDA
+========================= */
+
+function checkSharedApp() {
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    const slug =
+        params.get("app");
+
+
+    if (!slug) {
+
+        return;
+
+    }
+
+
+    const app =
+        apps.find(item => {
+
+            return (
+                createSlug(item.name) ===
+                slug
+            );
+
+        });
+
+
+    if (app) {
+
+        showAppDetails(app);
+
+    }
+
+}
+
+
+/* =========================
+   DETALLES DE LA APP
+========================= */
+
+function showAppDetails(app) {
+
+    const old =
+        document.getElementById(
+            "appDetails"
+        );
+
+
+    if (old) {
+
+        old.remove();
+
+    }
+
+
+    const details =
+        document.createElement(
+            "div"
+        );
+
+
+    details.id =
+        "appDetails";
+
+
+    details.innerHTML = `
+
+        <div class="app-details-box">
+
+            <button
+                class="app-details-close"
+                type="button"
+                aria-label="Cerrar"
+            >
+                ×
+            </button>
+
+            <img
+                class="app-details-image"
+                src="${app.image || "https://placehold.co/900x500/101722/39ff88?text=PKGX+STORE"}"
+                alt="${app.name || "Aplicación"}"
+            >
+
+            <div class="app-details-info">
+
+                <span class="category">
+                    ${app.category || "Otros"}
+                </span>
+
+                <h2>
+                    ${app.name || "Aplicación sin nombre"}
+                </h2>
+
+                <div class="version">
+                    Versión ${app.version || "N/A"}
+                </div>
+
+                <div class="app-details-actions">
+
+                    <a
+                        class="btn btn-download"
+                        href="${app.download || "#"}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Descargar
+                    </a>
+
+                    <button
+                        class="btn btn-share"
+                        type="button"
+                        id="detailsShare"
+                    >
+                        Compartir
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(
+        details
+    );
+
+
+    const close =
+        details.querySelector(
+            ".app-details-close"
+        );
+
+
+    close.addEventListener(
+        "click",
+        () => {
+
+            details.remove();
+
+            window.history.replaceState(
+                {},
+                "",
+                window.location.pathname
+            );
+
+        }
+    );
+
+
+    const shareButton =
+        details.querySelector(
+            "#detailsShare"
+        );
+
+
+    shareButton.addEventListener(
+        "click",
+        () => {
+
+            shareApp(app);
+
+        }
+    );
 
 }
 
