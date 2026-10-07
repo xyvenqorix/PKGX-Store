@@ -1,222 +1,169 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>PKGX Store</title>
+<head>
+
+    <meta
+        name="google-site-verification"
+        content="Gsg02YKES8nmffacm-HUekW7cojT1oLdIx6sP7xKTgY"
+    >
 
     <meta
         name="description"
-        content="PKGX Store — aplicaciones y herramientas para tu consola."
+        content="PKGX Store — aplicaciones, herramientas, utilidades y contenido para tu consola."
     >
 
-    <link rel="stylesheet" href="style.css">
+    <meta
+        name="keywords"
+        content="PKGX Store, PS4, homebrew, aplicaciones, herramientas, utilidades, emuladores"
+    >
+
+    <meta
+        name="author"
+        content="PKGX Store"
+    >
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>PKGX Store</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
 </head>
+
 
 <body>
 
-    <header class="header">
 
-        <div class="header-inner">
+<header class="header">
 
-            <a href="#" class="logo">
-                <span>PKGX</span> STORE
-            </a>
-
-            <nav class="nav">
-                <a href="#inicio">Inicio</a>
-                <a href="#apps">Aplicaciones</a>
-            </nav>
-
-        </div>
-
-    </header>
-
-
-    <main>
-
-        <!-- HERO -->
-
-        <section class="hero" id="inicio">
-
-            <div class="hero-content">
-
-                <span class="hero-label">
-                    PKGX STORE
-                </span>
-
-                <h1>
-                    Aplicaciones.<br>
-                    <span>En un solo lugar.</span>
-                </h1>
-
-                <p>
-                    Descubre aplicaciones, herramientas y utilidades
-                    organizadas de forma sencilla.
-                </p>
-
-                <a href="#apps" class="hero-button">
-                    Explorar aplicaciones
-                </a>
-
-            </div>
-
-        </section>
-
-
-        <!-- APLICACIONES -->
-
-        <section class="apps-section" id="apps">
-
-            <div class="section-top">
-
-                <div>
-                    <span class="section-label">
-                        CATÁLOGO
-                    </span>
-
-                    <h2>
-                        Aplicaciones
-                    </h2>
-                </div>
-
-                <div class="search-box">
-
-                    <input
-                        type="text"
-                        id="searchInput"
-                        placeholder="Buscar aplicación..."
-                        autocomplete="off"
-                    >
-
-                    <button id="searchButton" type="button">
-                        Buscar
-                    </button>
-
-                </div>
-
-            </div>
-
-
-            <div
-                class="categories"
-                id="categories"
-            ></div>
-
-
-            <div
-                class="apps-grid"
-                id="appsGrid"
-            >
-
-                <div class="loading">
-                    Cargando aplicaciones...
-                </div>
-
-            </div>
-
-
-            <div
-                class="empty"
-                id="emptyState"
-                style="display:none;"
-            >
-
-                <div class="empty-icon">
-                    —
-                </div>
-
-                <h3>
-                    No encontramos aplicaciones
-                </h3>
-
-                <p>
-                    Prueba con otro nombre o categoría.
-                </p>
-
-            </div>
-
-        </section>
-
-    </main>
-
-
-    <!-- MODAL COMPARTIR -->
-
-    <div
-        class="modal"
-        id="shareModal"
+    <a
+        href="#"
+        class="logo"
     >
+        PKGX<span>STORE</span>
+    </a>
 
-        <div class="modal-overlay" id="modalOverlay"></div>
 
-        <div class="modal-content">
+    <nav class="header-links">
 
-            <button
-                class="modal-close"
-                id="modalClose"
-                type="button"
-            >
-                ×
-            </button>
+        <a href="#inicio">
+            Inicio
+        </a>
 
-            <span class="section-label">
-                COMPARTIR
-            </span>
+        <a href="#apps">
+            Aplicaciones
+        </a>
 
-            <h3 id="shareTitle">
-                Compartir aplicación
-            </h3>
+    </nav>
 
-            <p>
-                Comparte el enlace de esta aplicación.
-            </p>
+</header>
 
-            <div class="share-url">
 
-                <input
-                    type="text"
-                    id="shareUrl"
-                    readonly
-                >
 
-                <button
-                    id="copyButton"
-                    type="button"
-                >
-                    Copiar
-                </button>
+<section
+    class="hero"
+    id="inicio"
+>
 
-            </div>
+    <div class="hero-content">
 
-            <button
-                class="native-share"
-                id="nativeShare"
-                type="button"
-            >
-                Compartir
-            </button>
+        <small>
+            PKGX STORE
+        </small>
 
-        </div>
+        <h1>
+            Aplicaciones.<br>
+            <span>En un solo lugar.</span>
+        </h1>
+
+        <p>
+            Explora aplicaciones, herramientas y utilidades
+            organizadas en un catálogo sencillo y moderno.
+        </p>
+
+        <a
+            href="#apps"
+            class="hero-button"
+        >
+            Explorar aplicaciones
+        </a>
 
     </div>
 
-
-    <footer class="footer">
-
-        <div>
-            © 2026 PKGX Store
-        </div>
-
-        <div>
-            Aplicaciones y herramientas
-        </div>
-
-    </footer>
+</section>
 
 
-    <script src="script.js"></script>
+
+<section
+    class="toolbar"
+    id="apps"
+>
+
+    <input
+        id="searchInput"
+        type="search"
+        placeholder="Buscar una aplicación..."
+        autocomplete="off"
+    >
+
+
+    <select id="categoryFilter">
+
+        <option value="">
+            Todas las categorías
+        </option>
+
+    </select>
+
+</section>
+
+
+
+<main
+    id="appsGrid"
+    class="apps-grid"
+>
+
+    <div class="loading">
+        Cargando aplicaciones...
+    </div>
+
+</main>
+
+
+
+<footer class="footer">
+
+    © 2026 PKGX Store · Aplicaciones y herramientas.
+
+</footer>
+
+
+
+<script src="script.js"></script>
 
 </body>
+
 </html>
