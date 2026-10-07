@@ -1,106 +1,99 @@
-const appsContainer =
-    document.getElementById("appsContainer");
+const appsGrid =
+    document.getElementById("appsGrid");
 
 const searchInput =
     document.getElementById("searchInput");
 
-const categoriesContainer =
-    document.getElementById("categories");
-
-const appCount =
-    document.getElementById("appCount");
-
-const noResults =
-    document.getElementById("noResults");
-
-
-const shareModal =
-    document.getElementById("shareModal");
-
-const shareTitle =
-    document.getElementById("shareTitle");
-
-const shareUrl =
-    document.getElementById("shareUrl");
-
-const copyButton =
-    document.getElementById("copyButton");
-
-const nativeShareButton =
-    document.getElementById("nativeShareButton");
-
-const closeModal =
-    document.getElementById("closeModal");
-
-const modalOverlay =
-    document.getElementById("modalOverlay");
+const categoryFilter =
+    document.getElementById("categoryFilter");
 
 
 let apps = [];
 
-let selectedCategory =
-    "all";
+
+/* =========================
+   SLUG
+========================= */
+
+function createSlug(name) {
+
+    return String(name || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(
+            /[\u0300-\u036f]/g,
+            ""
+        )
+        .replace(
+            /[^a-z0-9]+/g,
+            "-"
+        )
+        .replace(
+            /^-|-$/g,
+            "");
+
+}
 
 
 /* =========================
-   CARGAR APLICACIONES
+   URL
 ========================= */
 
-async function loadApps() {
+function getAppUrl(app) {
 
-    try {
+    return `${window.location.origin}${window.location.pathname}#${createSlug(app.name)}`;
 
-        const response =
-            await fetch("/api/apps");
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "No se pudieron cargar las aplicaciones."
-            );
-
-        }
+}
 
 
-        const data =
-            await response.json();
+/* =========================
+   COMPARTIR
+========================= */
+
+function shareApp(app) {
+
+    const appUrl =
+        getAppUrl(app);
 
 
-        apps =
-            Array.isArray(data)
-                ? data
-                : data.apps || [];
+    const message =
+        `Seguro te puede interesar esta aplicación:\n` +
+        `${appUrl}`;
 
 
-        createCategories();
+    if (navigator.share) {
 
-        renderApps();
+        navigator.share({
 
+            title:
+                app.name,
 
-        checkHash();
+            text:
+                message,
 
+            url:
+                appUrl
 
-    } catch (error) {
+        }).catch(() => {});
 
-        console.error(error);
+    } else if (navigator.clipboard) {
 
+        navigator.clipboard
+            .writeText(message)
+            .then(() => {
 
-        appsContainer.innerHTML = `
+                alert(
+                    "Enlace copiado para compartir."
+                );
 
-            <div class="state">
+            });
 
-                <h3>
-                    No se pudo cargar el catálogo
-                </h3>
+    } else {
 
-                <p>
-                    Inténtalo nuevamente más tarde.
-                </p>
-
-            </div>
-
-        `;
+        prompt(
+            "Copia este mensaje:",
+            message
+        );
 
     }
 
@@ -108,106 +101,45 @@ async function loadApps() {
 
 
 /* =========================
-   CATEGORÍAS
+   PLATAFORMAS / CATEGORÍAS
 ========================= */
 
-function createCategories() {
+function loadCategories() {
 
-    const categories =
-        [
-            ...new Set(
-                apps
-                    .map(app => app.category)
-                    .filter(Boolean)
-            )
-        ]
-        .sort();
+    const categories = [
+        ...new Set(
+            apps
+                .map(app => app.category)
+                .filter(Boolean)
+        )
+    ].sort();
 
 
-    categoriesContainer.innerHTML = "";
-
-
-    addCategoryButton(
-        "all",
-        "Todas"
-    );
+    categoryFilter.innerHTML = `
+        <option value="">
+            Todas las categorías
+        </option>
+    `;
 
 
     categories.forEach(category => {
 
-        addCategoryButton(
-            category,
-            category
+        const option =
+            document.createElement(
+                "option"
+            );
+
+        option.value =
+            category;
+
+        option.textContent =
+            category;
+
+        categoryFilter.appendChild(
+            option
         );
 
     });
-
-}
-
-
-function addCategoryButton(
-    value,
-    label
-) {
-
-    const button =
-        document.createElement("button");
-
-
-    button.className =
-        "category-button";
-
-
-    if (value === selectedCategory) {
-
-        button.classList.add("active");
-
-    }
-
-
-    button.dataset.category =
-        value;
-
-
-    button.textContent =
-        label;
-
-
-    button.addEventListener(
-        "click",
-        () => {
-
-            selectedCategory =
-                value;
-
-
-            document
-                .querySelectorAll(
-                    ".category-button"
-                )
-                .forEach(btn => {
-
-                    btn.classList.remove(
-                        "active"
-                    );
-
-                });
-
-
-            button.classList.add(
-                "active"
-            );
-
-
-            renderApps();
-
-        }
-    );
-
-
-    categoriesContainer.appendChild(
-        button
-    );
 
 }
 
@@ -220,8 +152,12 @@ function renderApps() {
 
     const search =
         searchInput.value
-            .trim()
-            .toLowerCase();
+            .toLowerCase()
+            .trim();
+
+
+    const category =
+        categoryFilter.value;
 
 
     const filtered =
@@ -233,513 +169,269 @@ function renderApps() {
                 ).toLowerCase();
 
 
-            const category =
+            const appCategory =
                 String(
                     app.category || ""
-                ).toLowerCase();
-
-
-            const matchesSearch =
-                !search ||
-                name.includes(search) ||
-                category.includes(search);
-
-
-            const matchesCategory =
-                selectedCategory === "all" ||
-                app.category === selectedCategory;
+                );
 
 
             return (
-                matchesSearch &&
-                matchesCategory
+
+                name.includes(search) &&
+
+                (
+                    !category ||
+                    appCategory === category
+                )
+
             );
 
         });
 
 
-    appCount.textContent =
-        filtered.length === 1
-            ? "1 aplicación"
-            : `${filtered.length} aplicaciones`;
-
-
-    appsContainer.innerHTML = "";
+    appsGrid.innerHTML = "";
 
 
     if (!filtered.length) {
 
-        noResults.classList.remove(
-            "hidden"
-        );
+        appsGrid.innerHTML = `
+            <div class="empty">
+                No se encontraron aplicaciones.
+            </div>
+        `;
 
         return;
 
     }
 
 
-    noResults.classList.add(
-        "hidden"
-    );
+    filtered.forEach(app => {
 
-
-    filtered.forEach(
-        (app, index) => {
-
-            const card =
-                createAppCard(
-                    app,
-                    index
-                );
-
-
-            appsContainer.appendChild(
-                card
+        const card =
+            document.createElement(
+                "article"
             );
 
-        }
-    );
+        card.className =
+            "app-card";
 
-}
 
+        const image =
+            document.createElement(
+                "img"
+            );
 
-/* =========================
-   CARD
-========================= */
+        image.className =
+            "app-image";
 
-function createAppCard(
-    app,
-    index
-) {
 
-    const card =
-        document.createElement(
-            "article"
-        );
+        image.src =
+            app.image ||
+            "https://placehold.co/900x500/101722/39ff88?text=PKGX+STORE";
 
 
-    card.className =
-        "app-card";
+        image.alt =
+            app.name ||
+            "Aplicación";
 
 
-    card.style.animationDelay =
-        `${Math.min(index * 45, 300)}ms`;
+        image.loading =
+            "lazy";
 
 
-    const slug =
-        createSlug(
-            app.name
-        );
+        image.onerror =
+            function () {
 
+                this.onerror =
+                    null;
 
-    card.id =
-        slug;
+                this.src =
+                    "https://placehold.co/900x500/101722/39ff88?text=PKGX+STORE";
 
+            };
 
-    const imageWrap =
-        document.createElement(
-            "div"
-        );
 
+        const content =
+            document.createElement(
+                "div"
+            );
 
-    imageWrap.className =
-        "app-image-wrap";
+        content.className =
+            "app-content";
 
 
-    const image =
-        document.createElement(
-            "img"
-        );
+        const categoryTag =
+            document.createElement(
+                "span"
+            );
 
+        categoryTag.className =
+            "category";
 
-    image.className =
-        "app-image";
+        categoryTag.textContent =
+            app.category ||
+            "Otros";
 
 
-    image.src =
-        app.image;
+        const title =
+            document.createElement(
+                "h2"
+            );
 
+        title.textContent =
+            app.name ||
+            "Aplicación sin nombre";
 
-    image.alt =
-        app.name;
 
+        const version =
+            document.createElement(
+                "div"
+            );
 
-    image.loading =
-        "lazy";
+        version.className =
+            "version";
 
+        version.textContent =
+            `Versión ${app.version || "N/A"}`;
 
-    image.onerror =
-        function () {
 
-            this.src =
-                createFallbackImage();
+        const actions =
+            document.createElement(
+                "div"
+            );
 
-        };
+        actions.className =
+            "card-actions";
 
 
-    const category =
-        document.createElement(
-            "span"
-        );
+        const download =
+            document.createElement(
+                "a"
+            );
 
+        download.className =
+            "btn btn-download";
 
-    category.className =
-        "app-category-badge";
+        download.textContent =
+            "Descargar";
 
+        download.href =
+            app.download ||
+            "#";
 
-    category.textContent =
-        app.category ||
-        "Other";
+        download.target =
+            "_blank";
 
+        download.rel =
+            "noopener noreferrer";
 
-    imageWrap.appendChild(
-        image
-    );
 
-    imageWrap.appendChild(
-        category
-    );
+        const share =
+            document.createElement(
+                "button"
+            );
 
+        share.className =
+            "btn btn-share";
 
-    const body =
-        document.createElement(
-            "div"
-        );
+        share.type =
+            "button";
 
+        share.textContent =
+            "Compartir";
 
-    body.className =
-        "app-body";
 
-
-    const name =
-        document.createElement(
-            "h3"
-        );
-
-
-    name.className =
-        "app-name";
-
-
-    name.textContent =
-        app.name;
-
-
-    const meta =
-        document.createElement(
-            "div"
-        );
-
-
-    meta.className =
-        "app-meta";
-
-
-    const version =
-        document.createElement(
-            "span"
-        );
-
-
-    version.className =
-        "app-version";
-
-
-    version.textContent =
-        "v" +
-        (
-            app.version ||
-            "Sin versión"
-        );
-
-
-    const dot =
-        document.createElement(
-            "span"
-        );
-
-
-    dot.className =
-        "meta-dot";
-
-
-    const categoryText =
-        document.createElement(
-            "span"
-        );
-
-
-    categoryText.className =
-        "app-category";
-
-
-    categoryText.textContent =
-        app.category ||
-        "Other";
-
-
-    meta.appendChild(
-        version
-    );
-
-    meta.appendChild(
-        dot
-    );
-
-    meta.appendChild(
-        categoryText
-    );
-
-
-    const actions =
-        document.createElement(
-            "div"
-        );
-
-
-    actions.className =
-        "app-actions";
-
-
-    const download =
-        document.createElement(
-            "a"
-        );
-
-
-    download.className =
-        "download-button";
-
-
-    download.href =
-        app.download;
-
-
-    download.target =
-        "_blank";
-
-
-    download.rel =
-        "noopener noreferrer";
-
-
-    download.textContent =
-        "Descargar";
-
-
-    const share =
-        document.createElement(
-            "button"
-        );
-
-
-    share.className =
-        "share-button";
-
-
-    share.type =
-        "button";
-
-
-    share.title =
-        "Compartir";
-
-
-    share.textContent =
-        "↗";
-
-
-    share.addEventListener(
-        "click",
-        () => openShare(app)
-    );
-
-
-    actions.appendChild(
-        download
-    );
-
-    actions.appendChild(
-        share
-    );
-
-
-    body.appendChild(
-        name
-    );
-
-    body.appendChild(
-        meta
-    );
-
-    body.appendChild(
-        actions
-    );
-
-
-    card.appendChild(
-        imageWrap
-    );
-
-    card.appendChild(
-        body
-    );
-
-
-    return card;
-
-}
-
-
-/* =========================
-   BUSCADOR
-========================= */
-
-searchInput.addEventListener(
-    "input",
-    renderApps
-);
-
-
-/* =========================
-   COMPARTIR
-========================= */
-
-function openShare(app) {
-
-    const slug =
-        createSlug(
-            app.name
-        );
-
-
-    const url =
-        `${window.location.origin}${window.location.pathname}#${slug}`;
-
-
-    shareTitle.textContent =
-        `Compartir ${app.name}`;
-
-
-    shareUrl.value =
-        url;
-
-
-    shareModal.classList.remove(
-        "hidden"
-    );
-
-
-    nativeShareButton.onclick =
-        async () => {
-
-            if (
-                navigator.share
-            ) {
-
-                try {
-
-                    await navigator.share({
-
-                        title:
-                            app.name,
-
-                        text:
-                            `Seguro te gusta este juego descargalo aqui: ${url}`,
-
-                        url:
-                            url
-
-                    });
-
-                } catch (error) {
-
-                    // Cancelado por el usuario.
-
-                }
-
-            } else {
-
-                copyToClipboard(
-                    url
-                );
-
-            }
-
-        };
-
-}
-
-
-function closeShare() {
-
-    shareModal.classList.add(
-        "hidden"
-    );
-
-}
-
-
-closeModal.addEventListener(
-    "click",
-    closeShare
-);
-
-
-modalOverlay.addEventListener(
-    "click",
-    closeShare
-);
-
-
-/* =========================
-   COPIAR
-========================= */
-
-copyButton.addEventListener(
-    "click",
-    async () => {
-
-        await copyToClipboard(
-            shareUrl.value
-        );
-
-
-        copyButton.textContent =
-            "Copiado";
-
-
-        setTimeout(
+        share.addEventListener(
+            "click",
             () => {
 
-                copyButton.textContent =
-                    "Copiar";
+                shareApp(app);
 
-            },
-            1500
+            }
         );
 
-    }
-);
+
+        actions.append(
+            download,
+            share
+        );
 
 
-async function copyToClipboard(
-    text
-) {
+        content.append(
+            categoryTag,
+            title,
+            version,
+            actions
+        );
+
+
+        card.append(
+            image,
+            content
+        );
+
+
+        appsGrid.appendChild(
+            card
+        );
+
+    });
+
+}
+
+
+/* =========================
+   API
+========================= */
+
+async function loadApps() {
 
     try {
 
-        await navigator.clipboard.writeText(
-            text
-        );
+        const response =
+            await fetch(
+                "/api/apps"
+            );
 
-    } catch {
 
-        shareUrl.select();
+        if (!response.ok) {
 
-        document.execCommand(
-            "copy"
-        );
+            throw new Error(
+                "No se pudieron cargar las aplicaciones"
+            );
+
+        }
+
+
+        apps =
+            await response.json();
+
+
+        if (!Array.isArray(apps)) {
+
+            apps = [];
+
+        }
+
+
+        loadCategories();
+
+        renderApps();
+
+        checkHash();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        appsGrid.innerHTML = `
+            <div class="empty">
+                No se pudieron cargar las aplicaciones.
+                Intenta nuevamente.
+            </div>
+        `;
 
     }
 
@@ -752,119 +444,63 @@ async function copyToClipboard(
 
 function checkHash() {
 
-    const hash =
+    const slug =
         window.location.hash
-            .replace(
-                "#",
-                ""
-            );
+            .replace("#", "")
+            .trim();
 
 
-    if (!hash) {
+    if (!slug) {
+
         return;
+
     }
 
 
-    const target =
-        document.getElementById(
-            hash
-        );
+    const app =
+        apps.find(item => {
+
+            return (
+                createSlug(item.name) ===
+                slug
+            );
+
+        });
 
 
-    if (target) {
+    if (app) {
 
-        setTimeout(
-            () => {
-
-                target.scrollIntoView({
-                    behavior:
-                        "smooth",
-                    block:
-                        "center"
-                });
-
-            },
-            300
-        );
+        document
+            .getElementById("apps")
+            .scrollIntoView({
+                behavior: "smooth"
+            });
 
     }
 
 }
+
+
+/* =========================
+   EVENTOS
+========================= */
+
+searchInput.addEventListener(
+    "input",
+    renderApps
+);
+
+
+categoryFilter.addEventListener(
+    "change",
+    renderApps
+);
 
 
 window.addEventListener(
     "hashchange",
     checkHash
 );
-
-
-/* =========================
-   SLUG
-========================= */
-
-function createSlug(
-    value
-) {
-
-    return String(value)
-        .normalize("NFD")
-        .replace(
-            /[\u0300-\u036f]/g,
-            ""
-        )
-        .toLowerCase()
-        .trim()
-        .replace(
-            /[^a-z0-9]+/g,
-            "-"
-        )
-        .replace(
-            /^-+|-+$/g,
-            ""
-        );
-
-}
-
-
-/* =========================
-   IMAGEN FALLBACK
-========================= */
-
-function createFallbackImage() {
-
-    return (
-        "data:image/svg+xml;charset=UTF-8," +
-        encodeURIComponent(`
-
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="800"
-                height="450"
-            >
-
-                <rect
-                    width="800"
-                    height="450"
-                    fill="#0b0f14"
-                />
-
-                <text
-                    x="400"
-                    y="225"
-                    text-anchor="middle"
-                    fill="#697582"
-                    font-family="Arial"
-                    font-size="30"
-                >
-                    PKGX STORE
-                </text>
-
-            </svg>
-
-        `)
-    );
-
-}
 
 
 /* =========================
