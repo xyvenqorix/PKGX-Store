@@ -1,169 +1,443 @@
-<!DOCTYPE html>
-<html lang="es">
+const grid = document.getElementById("appsGrid");
+const searchInput = document.getElementById("searchInput");
+const categorySelect = document.getElementById("categorySelect");
 
-<head>
+let apps = [];
 
-    <meta
-        name="google-site-verification"
-        content="Gsg02YKES8nmffacm-HUekW7cojT1oLdIx6sP7xKTgY"
-    >
+// Crear slug para la URL
+function createSlug(text) {
+    return String(text)
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+}
 
-    <meta
-        name="description"
-        content="PKGX Store — aplicaciones, herramientas, utilidades y contenido para tu consola."
-    >
+// Cargar aplicaciones
+async function loadApps() {
+    try {
+        const response = await fetch("/api/apps");
 
-    <meta
-        name="keywords"
-        content="PKGX Store, PS4, homebrew, aplicaciones, herramientas, utilidades, emuladores"
-    >
+        if (!response.ok) {
+            throw new Error("No se pudieron cargar las aplicaciones");
+        }
 
-    <meta
-        name="author"
-        content="PKGX Store"
-    >
+        apps = await response.json();
 
-    <meta charset="UTF-8">
+        renderApps();
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+        // Si la URL tiene ?app=..., abrir directamente esa aplicación
+        const params = new URLSearchParams(window.location.search);
+        const appSlug = params.get("app");
 
-    <title>PKGX Store</title>
+        if (appSlug) {
+            const app = apps.find(
+                item => createSlug(item.name) === appSlug
+            );
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+            if (app) {
+                openAppDetails(app);
+            }
+        }
 
-    <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
+    } catch (error) {
+        console.error(error);
 
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
+        grid.innerHTML = `
+            <div class="empty">
+                No se pudieron cargar las aplicaciones.
+            </div>
+        `;
+    }
+}
 
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+// Renderizar tarjetas
+function renderApps() {
+    const search = searchInput.value
+        .toLowerCase()
+        .trim();
 
-</head>
+    const category = categorySelect.value;
 
+    const filtered = apps.filter(app => {
+        const matchesSearch =
+            String(app.name)
+                .toLowerCase()
+                .includes(search);
 
-<body>
+        const matchesCategory =
+            !category ||
+            String(app.category).toLowerCase() ===
+            category.toLowerCase();
 
+        return matchesSearch && matchesCategory;
+    });
 
-<header class="header">
+    if (!filtered.length) {
+        grid.innerHTML = `
+            <div class="empty">
+                No se encontraron aplicaciones.
+            </div>
+        `;
+        return;
+    }
 
-    <a
-        href="#"
-        class="logo"
-    >
-        PKGX<span>STORE</span>
-    </a>
+    grid.innerHTML = filtered.map(app => {
+        const slug = createSlug(app.name);
 
+        return `
+            <article class="app-card">
 
-    <nav class="header-links">
+                <img
+                    src="${escapeHtml(app.image)}"
+                    alt="${escapeHtml(app.name)}"
+                    class="app-image"
+                    loading="lazy"
+                    onclick="openAppDetailsBySlug('${slug}')"
+                >
 
-        <a href="#inicio">
-            Inicio
-        </a>
+                <div class="app-content">
 
-        <a href="#apps">
-            Aplicaciones
-        </a>
+                    <div class="app-category">
+                        ${escapeHtml(app.category)}
+                    </div>
 
-    </nav>
+                    <h3>
+                        ${escapeHtml(app.name)}
+                    </h3>
 
-</header>
+                    <div class="app-version">
+                        Versión ${escapeHtml(app.version)}
+                    </div>
 
+                    <div class="app-actions">
 
+                        <a
+                            href="${escapeHtml(app.download)}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="download-btn"
+                        >
+                            Descargar
+                        </a>
 
-<section
-    class="hero"
-    id="inicio"
->
+                        <button
+                            class="share-btn"
+                            onclick="shareApp('${slug}')"
+                        >
+                            Compartir
+                        </button>
 
-    <div class="hero-content">
+                    </div>
 
-        <small>
-            PKGX STORE
-        </small>
+                </div>
 
-        <h1>
-            Aplicaciones.<br>
-            <span>En un solo lugar.</span>
-        </h1>
+            </article>
+        `;
+    }).join("");
+}
 
-        <p>
-            Explora aplicaciones, herramientas y utilidades
-            organizadas en un catálogo sencillo y moderno.
-        </p>
+// Abrir detalles por slug
+function openAppDetailsBySlug(slug) {
+    const app = apps.find(
+        item => createSlug(item.name) === slug
+    );
 
-        <a
-            href="#apps"
-            class="hero-button"
-        >
-            Explorar aplicaciones
-        </a>
+    if (app) {
+        openAppDetails(app);
+    }
+}
 
-    </div>
+// Mostrar detalles de la aplicación
+function openAppDetails(app) {
 
-</section>
+    const oldModal = document.getElementById("appModal");
 
+    if (oldModal) {
+        oldModal.remove();
+    }
 
+    const slug = createSlug(app.name);
 
-<section
-    class="toolbar"
-    id="apps"
->
+    const modal = document.createElement("div");
 
-    <input
-        id="searchInput"
-        type="search"
-        placeholder="Buscar una aplicación..."
-        autocomplete="off"
-    >
+    modal.id = "appModal";
+    modal.className = "app-modal";
 
+    modal.innerHTML = `
+        <div class="app-modal-overlay" onclick="closeAppDetails()"></div>
 
-    <select id="categoryFilter">
+        <div class="app-modal-content">
 
-        <option value="">
-            Todas las categorías
-        </option>
+            <button
+                class="modal-close"
+                onclick="closeAppDetails()"
+                aria-label="Cerrar"
+            >
+                ×
+            </button>
 
-    </select>
+            <img
+                src="${escapeHtml(app.image)}"
+                alt="${escapeHtml(app.name)}"
+                class="modal-image"
+            >
 
-</section>
+            <div class="modal-info">
 
+                <div class="app-category">
+                    ${escapeHtml(app.category)}
+                </div>
 
+                <h2>
+                    ${escapeHtml(app.name)}
+                </h2>
 
-<main
-    id="appsGrid"
-    class="apps-grid"
->
+                <div class="modal-version">
+                    Versión ${escapeHtml(app.version)}
+                </div>
 
-    <div class="loading">
-        Cargando aplicaciones...
-    </div>
+                <div class="modal-actions">
 
-</main>
+                    <a
+                        href="${escapeHtml(app.download)}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="download-btn"
+                    >
+                        Descargar
+                    </a>
 
+                    <button
+                        class="share-btn"
+                        onclick="shareApp('${slug}')"
+                    >
+                        Compartir
+                    </button>
 
+                </div>
 
-<footer class="footer">
+            </div>
 
-    © 2026 PKGX Store · Aplicaciones y herramientas.
+        </div>
+    `;
 
-</footer>
+    document.body.appendChild(modal);
 
+    document.body.classList.add("modal-open");
 
+    // Actualizar URL sin usar #
+    const newUrl =
+        `${window.location.origin}${window.location.pathname}?app=${encodeURIComponent(slug)}`;
 
-<script src="script.js"></script>
+    window.history.pushState(
+        { app: slug },
+        "",
+        newUrl
+    );
+}
 
-</body>
+// Cerrar detalles
+function closeAppDetails() {
 
-</html>
+    const modal = document.getElementById("appModal");
+
+    if (modal) {
+        modal.remove();
+    }
+
+    document.body.classList.remove("modal-open");
+
+    // Volver a la URL normal
+    window.history.pushState(
+        {},
+        "",
+        window.location.pathname
+    );
+}
+
+// Compartir aplicación
+async function shareApp(slug) {
+
+    const app = apps.find(
+        item => createSlug(item.name) === slug
+    );
+
+    if (!app) return;
+
+    const shareUrl =
+        `${window.location.origin}${window.location.pathname}?app=${encodeURIComponent(slug)}`;
+
+    const shareText =
+        `Seguro te puede interesar esta aplicación:\n${app.name}\n\n${shareUrl}`;
+
+    try {
+
+        if (navigator.share) {
+
+            await navigator.share({
+                title: app.name,
+                text: shareText,
+                url: shareUrl
+            });
+
+        } else {
+
+            await navigator.clipboard.writeText(shareUrl);
+
+            alert("Enlace copiado correctamente.");
+
+        }
+
+    } catch (error) {
+
+        // El usuario canceló el menú de compartir.
+        console.log("Compartir cancelado.");
+
+    }
+}
+
+// Cerrar con ESC
+document.addEventListener("keydown", event => {
+
+    if (event.key === "Escape") {
+        closeAppDetails();
+    }
+
+});
+
+// Si el usuario usa atrás/adelante del navegador
+window.addEventListener("popstate", () => {
+
+    const params = new URLSearchParams(
+        window.location.search
+    );
+
+    const slug = params.get("app");
+
+    if (!slug) {
+        const modal = document.getElementById("appModal");
+
+        if (modal) {
+            modal.remove();
+        }
+
+        document.body.classList.remove("modal-open");
+
+        return;
+    }
+
+    const app = apps.find(
+        item => createSlug(item.name) === slug
+    );
+
+    if (app) {
+        openAppDetailsWithoutHistory(app);
+    }
+
+});
+
+// Abrir detalles sin volver a modificar el historial
+function openAppDetailsWithoutHistory(app) {
+
+    const oldModal = document.getElementById("appModal");
+
+    if (oldModal) {
+        oldModal.remove();
+    }
+
+    const slug = createSlug(app.name);
+
+    const modal = document.createElement("div");
+
+    modal.id = "appModal";
+    modal.className = "app-modal";
+
+    modal.innerHTML = `
+        <div class="app-modal-overlay" onclick="closeAppDetails()"></div>
+
+        <div class="app-modal-content">
+
+            <button
+                class="modal-close"
+                onclick="closeAppDetails()"
+            >
+                ×
+            </button>
+
+            <img
+                src="${escapeHtml(app.image)}"
+                alt="${escapeHtml(app.name)}"
+                class="modal-image"
+            >
+
+            <div class="modal-info">
+
+                <div class="app-category">
+                    ${escapeHtml(app.category)}
+                </div>
+
+                <h2>
+                    ${escapeHtml(app.name)}
+                </h2>
+
+                <div class="modal-version">
+                    Versión ${escapeHtml(app.version)}
+                </div>
+
+                <div class="modal-actions">
+
+                    <a
+                        href="${escapeHtml(app.download)}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="download-btn"
+                    >
+                        Descargar
+                    </a>
+
+                    <button
+                        class="share-btn"
+                        onclick="shareApp('${slug}')"
+                    >
+                        Compartir
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    document.body.classList.add("modal-open");
+}
+
+// Evitar HTML malicioso en nombres/URLs
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+// Búsqueda
+searchInput.addEventListener(
+    "input",
+    renderApps
+);
+
+// Categorías
+categorySelect.addEventListener(
+    "change",
+    renderApps
+);
+
+// Iniciar
+loadApps();
