@@ -1,1003 +1,530 @@
-const appsGrid =
-    document.getElementById("appsGrid");
 
-const searchInput =
-    document.getElementById("searchInput");
+const API_URL = "/api/apps";
+const PAGE_SIZE = 12;
 
-const categoryFilter =
-    document.getElementById("categoryFilter");
+const grid = document.getElementById("appsGrid");
+const searchInput = document.getElementById("searchInput");
+const categoryFilter = document.getElementById("categoryFilter");
+const pagination = document.getElementById("pagination");
+const totalCount = document.getElementById("totalCount");
+const catalogStatus = document.getElementById("catalogStatus");
 
+const modal = document.getElementById("appModal");
+const modalImage = document.getElementById("modalImage");
+const modalTitle = document.getElementById("modalTitle");
+const modalCategory = document.getElementById("modalCategory");
+const modalVersion = document.getElementById("modalVersion");
+const downloadButton = document.getElementById("downloadButton");
+const shareButton = document.getElementById("shareButton");
+const closeModalButton = document.getElementById("closeModal");
 
-let apps = [];
+let allApps = [];
+let filteredApps = [];
+let currentPage = 1;
+let selectedApp = null;
 
+const categoryNames = {
+  android: "Android",
+  pc: "PC",
+  roms_isos_games: "ROMs / ISOs / Games"
+};
 
-/* =========================
-   SLUG
-========================= */
-
-function createSlug(name) {
-
-    return String(name || "")
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(
-            /[\u0300-\u036f]/g,
-            ""
-        )
-        .replace(
-            /[^a-z0-9]+/g,
-            "-"
-        )
-        .replace(
-            /^-|-$/g,
-            "");
-
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, character => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[character]);
 }
 
-
-/* =========================
-   URL
-========================= */
-
-function getAppUrl(app) {
-
-    return (
-        window.location.origin +
-        window.location.pathname +
-        "?app=" +
-        encodeURIComponent(
-            createSlug(app.name)
-        )
-    );
-
+function getAppName(app) {
+  return app.name ?? app.title ?? "Sin nombre";
 }
 
-
-/* =========================
-   ESTILOS DEL EMERGENTE
-========================= */
-
-const popupStyle =
-    document.createElement("style");
-
-popupStyle.textContent = `
-
-#pkgxAppPopup {
-
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 999999;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    padding: 20px;
-
-    background: rgba(0,0,0,.82);
-
-    backdrop-filter: blur(8px);
-
+function getAppImage(app) {
+  return app.image ?? app.imageUrl ?? app.imageURL ?? app.photo ?? "";
 }
 
-#pkgxAppPopup .popup-box {
-
-    width: min(430px, 100%);
-
-    max-height: 90vh;
-
-    overflow-y: auto;
-
-    background: #101722;
-
-    border: 1px solid #263242;
-
-    border-radius: 18px;
-
-    box-shadow:
-        0 25px 80px rgba(0,0,0,.55);
-
-    overflow: hidden;
-
-    position: relative;
-
+function getAppCategory(app) {
+  return app.category ?? app.platform ?? "android";
 }
 
-#pkgxAppPopup .popup-image {
-
-    width: 100%;
-
-    display: block;
-
-    max-height: 330px;
-
-    object-fit: cover;
-
+function getAppVersion(app) {
+  return app.version ?? "";
 }
 
-#pkgxAppPopup .popup-content {
-
-    padding: 20px;
-
+function getDownloadURL(app) {
+  return app.url ?? app.downloadUrl ?? app.downloadURL ?? app.link ?? "";
 }
 
-#pkgxAppPopup .popup-category {
-
-    display: inline-block;
-
-    padding: 5px 10px;
-
-    border-radius: 999px;
-
-    background: rgba(57,255,136,.10);
-
-    color: #39ff88;
-
-    font-size: 12px;
-
-    margin-bottom: 10px;
-
+function slugify(value) {
+  return String(value)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
-#pkgxAppPopup h2 {
-
-    margin: 0 0 8px;
-
-    color: #ffffff;
-
-    font-size: 24px;
-
+function getAppSlug(app) {
+  return slugify(app.slug || getAppName(app));
 }
 
-#pkgxAppPopup .popup-version {
-
-    color: #9da8b7;
-
-    font-size: 14px;
-
-    margin-bottom: 20px;
-
+function getShareURL(app) {
+  const url = new URL(window.location.href);
+  url.searchParams.set("app", getAppSlug(app));
+  url.hash = "catalogo";
+  return url.href;
 }
 
-#pkgxAppPopup .popup-download {
-
-    display: block;
-
-    width: 100%;
-
-    box-sizing: border-box;
-
-    text-align: center;
-
-    text-decoration: none;
-
-    padding: 12px 16px;
-
-    border-radius: 10px;
-
-    background: #39ff88;
-
-    color: #07100b;
-
-    font-weight: 700;
-
+function isSafeWebURL(value) {
+  try {
+    const url = new URL(value, window.location.origin);
+    return url.protocol === "https:" || url.protocol === "http:";
+  } catch {
+    return false;
+  }
 }
 
-#pkgxAppPopup .popup-close {
-
-    position: absolute;
-
-    top: 12px;
-
-    right: 12px;
-
-    width: 36px;
-
-    height: 36px;
-
-    border: 0;
-
-    border-radius: 50%;
-
-    background: rgba(0,0,0,.65);
-
-    color: white;
-
-    font-size: 24px;
-
-    line-height: 36px;
-
-    cursor: pointer;
-
-    z-index: 2;
-
+function safeImageURL(value) {
+  return isSafeWebURL(value) ? value : "";
 }
 
-#pkgxAppPopup .popup-close:hover {
-
-    background: rgba(0,0,0,.85);
-
+function getCategoryLabel(category) {
+  return categoryNames[category] || String(category || "Aplicación");
 }
-
-body.pkgx-popup-open {
-
-    overflow: hidden;
-
-}
-
-`;
-
-document.head.appendChild(
-    popupStyle
-);
-
-
-/* =========================
-   ABRIR EMERGENTE
-========================= */
-
-function openAppPopup(app) {
-
-    closeAppPopup();
-
-
-    const popup =
-        document.createElement("div");
-
-    popup.id =
-        "pkgxAppPopup";
-
-
-    popup.innerHTML = `
-
-        <div class="popup-box">
-
-            <button
-                class="popup-close"
-                type="button"
-                aria-label="Cerrar"
-            >
-                ×
-            </button>
-
-            <img
-                class="popup-image"
-                src="${app.image || "https://placehold.co/900x500/101722/39ff88?text=PKGX+STORE"}"
-                alt="${app.name || "Aplicación"}"
-            >
-
-            <div class="popup-content">
-
-                <span class="popup-category">
-                    ${app.category || "Otros"}
-                </span>
-
-                <h2>
-                    ${app.name || "Aplicación sin nombre"}
-                </h2>
-
-                <div class="popup-version">
-                    Versión ${app.version || "N/A"}
-                </div>
-
-                <a
-                    class="popup-download"
-                    href="${app.download || "#"}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Descargar
-                </a>
-
-            </div>
-
-        </div>
-
-    `;
-
-
-    document.body.appendChild(
-        popup
-    );
-
-
-    document.body.classList.add(
-        "pkgx-popup-open"
-    );
-
-
-    /* Cerrar con X */
-
-    popup
-        .querySelector(".popup-close")
-        .addEventListener(
-            "click",
-            closeAppPopup
-        );
-
-
-    /* Cerrar tocando fuera */
-
-    popup.addEventListener(
-        "click",
-        function(event) {
-
-            if (
-                event.target === popup
-            ) {
-
-                closeAppPopup();
-
-            }
-
-        }
-    );
-
-
-    /* ESC */
-
-    document.addEventListener(
-        "keydown",
-        popupEscHandler
-    );
-
-
-    /*
-     * Cambiar URL sin recargar
-     */
-
-    history.pushState(
-        {
-            app:
-                createSlug(app.name)
-        },
-        "",
-        getAppUrl(app)
-    );
-
-}
-
-
-/* =========================
-   CERRAR EMERGENTE
-========================= */
-
-function closeAppPopup() {
-
-    const popup =
-        document.getElementById(
-            "pkgxAppPopup"
-        );
-
-
-    if (popup) {
-
-        popup.remove();
-
-    }
-
-
-    document.body.classList.remove(
-        "pkgx-popup-open"
-    );
-
-
-    document.removeEventListener(
-        "keydown",
-        popupEscHandler
-    );
-
-
-    /*
-     * Volver a la URL normal
-     */
-
-    if (
-        window.location.search
-    ) {
-
-        history.replaceState(
-            {},
-            "",
-            window.location.pathname
-        );
-
-    }
-
-}
-
-
-function popupEscHandler(event) {
-
-    if (
-        event.key === "Escape"
-    ) {
-
-        closeAppPopup();
-
-    }
-
-}
-
-
-/* =========================
-   ABRIR DESDE URL
-========================= */
-
-function checkSharedApp() {
-
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
-
-
-    const slug =
-        params.get("app");
-
-
-    if (!slug) {
-
-        return;
-
-    }
-
-
-    const app =
-        apps.find(item => {
-
-            return (
-                createSlug(item.name) ===
-                slug
-            );
-
-        });
-
-
-    if (app) {
-
-        openAppPopupFromUrl(app);
-
-    }
-
-}
-
-
-/*
- * Igual que el popup normal,
- * pero no vuelve a modificar la URL.
- */
-
-function openAppPopupFromUrl(app) {
-
-    closePopupOnly();
-
-
-    const popup =
-        document.createElement("div");
-
-    popup.id =
-        "pkgxAppPopup";
-
-
-    popup.innerHTML = `
-
-        <div class="popup-box">
-
-            <button
-                class="popup-close"
-                type="button"
-            >
-                ×
-            </button>
-
-            <img
-                class="popup-image"
-                src="${app.image || "https://placehold.co/900x500/101722/39ff88?text=PKGX+STORE"}"
-                alt="${app.name || "Aplicación"}"
-            >
-
-            <div class="popup-content">
-
-                <span class="popup-category">
-                    ${app.category || "Otros"}
-                </span>
-
-                <h2>
-                    ${app.name || "Aplicación sin nombre"}
-                </h2>
-
-                <div class="popup-version">
-                    Versión ${app.version || "N/A"}
-                </div>
-
-                <a
-                    class="popup-download"
-                    href="${app.download || "#"}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Descargar
-                </a>
-
-            </div>
-
-        </div>
-
-    `;
-
-
-    document.body.appendChild(
-        popup
-    );
-
-
-    document.body.classList.add(
-        "pkgx-popup-open"
-    );
-
-
-    popup
-        .querySelector(".popup-close")
-        .addEventListener(
-            "click",
-            function() {
-
-                closeAppPopup();
-
-            }
-        );
-
-
-    popup.addEventListener(
-        "click",
-        function(event) {
-
-            if (
-                event.target === popup
-            ) {
-
-                closeAppPopup();
-
-            }
-
-        }
-    );
-
-
-    document.addEventListener(
-        "keydown",
-        popupEscHandler
-    );
-
-}
-
-
-function closePopupOnly() {
-
-    const popup =
-        document.getElementById(
-            "pkgxAppPopup"
-        );
-
-
-    if (popup) {
-
-        popup.remove();
-
-    }
-
-}
-
-
-/* =========================
-   CATEGORÍAS
-========================= */
-
-function loadCategories() {
-
-    const categories = [
-        ...new Set(
-            apps
-                .map(app => app.category)
-                .filter(Boolean)
-        )
-    ].sort();
-
-
-    categoryFilter.innerHTML = `
-        <option value="">
-            Todas las categorías
-        </option>
-    `;
-
-
-    categories.forEach(category => {
-
-        const option =
-            document.createElement(
-                "option"
-            );
-
-        option.value =
-            category;
-
-        option.textContent =
-            category;
-
-        categoryFilter.appendChild(
-            option
-        );
-
-    });
-
-}
-
-
-/* =========================
-   RENDER
-========================= */
-
-function renderApps() {
-
-    const search =
-        searchInput.value
-            .toLowerCase()
-            .trim();
-
-
-    const category =
-        categoryFilter.value;
-
-
-    const filtered =
-        apps.filter(app => {
-
-            const name =
-                String(
-                    app.name || ""
-                ).toLowerCase();
-
-
-            const appCategory =
-                String(
-                    app.category || ""
-                );
-
-
-            return (
-
-                name.includes(search) &&
-
-                (
-                    !category ||
-                    appCategory === category
-                )
-
-            );
-
-        });
-
-
-    appsGrid.innerHTML = "";
-
-
-    if (!filtered.length) {
-
-        appsGrid.innerHTML = `
-            <div class="empty">
-                No se encontraron aplicaciones.
-            </div>
-        `;
-
-        return;
-
-    }
-
-
-    filtered.forEach(app => {
-
-        const card =
-            document.createElement(
-                "article"
-            );
-
-        card.className =
-            "app-card";
-
-
-        const image =
-            document.createElement(
-                "img"
-            );
-
-        image.className =
-            "app-image";
-
-
-        image.src =
-            app.image ||
-            "https://placehold.co/900x500/101722/39ff88?text=PKGX+STORE";
-
-
-        image.alt =
-            app.name ||
-            "Aplicación";
-
-
-        image.loading =
-            "lazy";
-
-
-        image.onerror =
-            function () {
-
-                this.onerror =
-                    null;
-
-                this.src =
-                    "https://placehold.co/900x500/101722/39ff88?text=PKGX+STORE";
-
-            };
-
-
-        /*
-         * LA IMAGEN ABRE EL EMERGENTE
-         */
-
-        image.style.cursor =
-            "pointer";
-
-
-        image.addEventListener(
-            "click",
-            function() {
-
-                openAppPopup(app);
-
-            }
-        );
-
-
-        const content =
-            document.createElement(
-                "div"
-            );
-
-        content.className =
-            "app-content";
-
-
-        const categoryTag =
-            document.createElement(
-                "span"
-            );
-
-        categoryTag.className =
-            "category";
-
-        categoryTag.textContent =
-            app.category ||
-            "Otros";
-
-
-        const title =
-            document.createElement(
-                "h2"
-            );
-
-        title.textContent =
-            app.name ||
-            "Aplicación sin nombre";
-
-
-        const version =
-            document.createElement(
-                "div"
-            );
-
-        version.className =
-            "version";
-
-        version.textContent =
-            `Versión ${app.version || "N/A"}`;
-
-
-        const actions =
-            document.createElement(
-                "div"
-            );
-
-        actions.className =
-            "card-actions";
-
-
-        const download =
-            document.createElement(
-                "a"
-            );
-
-        download.className =
-            "btn btn-download";
-
-        download.textContent =
-            "Descargar";
-
-        download.href =
-            app.download ||
-            "#";
-
-        download.target =
-            "_blank";
-
-        download.rel =
-            "noopener noreferrer";
-
-
-        actions.append(
-            download
-        );
-
-
-        content.append(
-            categoryTag,
-            title,
-            version,
-            actions
-        );
-
-
-        card.append(
-            image,
-            content
-        );
-
-
-        appsGrid.appendChild(
-            card
-        );
-
-    });
-
-}
-
-
-/* =========================
-   API
-========================= */
 
 async function loadApps() {
+  catalogStatus.textContent = "Cargando catálogo...";
+  grid.innerHTML = "";
+  pagination.innerHTML = "";
 
-    try {
+  try {
+    const response = await fetch(API_URL, {
+      headers: { Accept: "application/json" }
+    });
 
-        const response =
-            await fetch(
-                "/api/apps"
-            );
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "No se pudieron cargar las aplicaciones"
-            );
-
-        }
-
-
-        apps =
-            await response.json();
-
-
-        if (!Array.isArray(apps)) {
-
-            apps = [];
-
-        }
-
-
-        loadCategories();
-
-        renderApps();
-
-        /*
-         * Si viene ?app=
-         * abrir automáticamente
-         */
-
-        checkSharedApp();
-
-
-    } catch (error) {
-
-        console.error(error);
-
-
-        appsGrid.innerHTML = `
-            <div class="empty">
-                No se pudieron cargar las aplicaciones.
-                Intenta nuevamente.
-            </div>
-        `;
-
+    if (!response.ok) {
+      throw new Error(`Error HTTP ${response.status}`);
     }
 
+    const data = await response.json();
+
+    // Acepta una respuesta en forma de array o { apps: [...] }.
+    const apps = Array.isArray(data)
+      ? data
+      : Array.isArray(data.apps)
+        ? data.apps
+        : Array.isArray(data.titles)
+          ? data.titles
+          : null;
+
+    if (!apps) {
+      throw new Error("La API no devolvió una lista de aplicaciones.");
+    }
+
+    allApps = apps;
+    catalogStatus.textContent = "";
+
+    applyFilters();
+
+    // Abre una aplicación si se entra con ?app=nombre
+    const requestedSlug = new URLSearchParams(window.location.search).get("app");
+
+    if (requestedSlug) {
+      const app = allApps.find(item => getAppSlug(item) === requestedSlug);
+
+      if (app) {
+        openModal(app, false);
+      }
+    }
+  } catch (error) {
+    console.error("No se pudo cargar el catálogo:", error);
+
+    allApps = [];
+    filteredApps = [];
+    currentPage = 1;
+
+    totalCount.textContent = "Sin datos";
+    catalogStatus.textContent =
+      "No se pudo cargar el catálogo. Comprueba que /api/apps esté funcionando.";
+    grid.innerHTML = "";
+    pagination.innerHTML = "";
+  }
 }
 
+function applyFilters() {
+  const query = searchInput.value.trim().toLocaleLowerCase();
+  const category = categoryFilter.value;
 
-/* =========================
-   EVENTOS
-========================= */
+  filteredApps = allApps.filter(app => {
+    const name = getAppName(app).toLocaleLowerCase();
+    const appCategory = String(getAppCategory(app)).toLowerCase();
 
-searchInput.addEventListener(
-    "input",
-    renderApps
-);
+    const matchesSearch = name.includes(query);
+    const matchesCategory =
+      category === "all" || appCategory === category.toLowerCase();
 
+    return matchesSearch && matchesCategory;
+  });
 
-categoryFilter.addEventListener(
-    "change",
-    renderApps
-);
+  currentPage = 1;
+  renderCatalog();
+}
 
+function renderCatalog() {
+  const total = filteredApps.length;
+  const totalPages = Math.ceil(total / PAGE_SIZE);
 
-/* =========================
-   ATRÁS / ADELANTE
-========================= */
+  if (currentPage > totalPages && totalPages > 0) {
+    currentPage = totalPages;
+  }
 
-window.addEventListener(
-    "popstate",
-    function() {
+  if (totalPages === 0) {
+    currentPage = 1;
+  }
 
-        const params =
-            new URLSearchParams(
-                window.location.search
-            );
+  totalCount.textContent =
+    `${total} ${total === 1 ? "resultado" : "resultados"}`;
 
-        const slug =
-            params.get("app");
+  if (total === 0) {
+    grid.innerHTML = "";
+    pagination.innerHTML = "";
 
-
-        if (!slug) {
-
-            closePopupOnly();
-
-            document.body.classList.remove(
-                "pkgx-popup-open"
-            );
-
-            return;
-
-        }
-
-
-        const app =
-            apps.find(item => {
-
-                return (
-                    createSlug(item.name) ===
-                    slug
-                );
-
-            });
-
-
-        if (app) {
-
-            openAppPopupFromUrl(app);
-
-        }
-
+    if (allApps.length === 0) {
+      catalogStatus.textContent = "Todavía no hay aplicaciones en el catálogo.";
+    } else {
+      catalogStatus.textContent =
+        "No se encontraron resultados. Prueba otra búsqueda o categoría.";
     }
-);
 
+    return;
+  }
 
-/* =========================
-   INICIAR
-========================= */
+  catalogStatus.textContent = "";
+
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const pageApps = filteredApps.slice(start, start + PAGE_SIZE);
+
+  grid.innerHTML = pageApps.map((app, index) => {
+    const name = getAppName(app);
+    const category = getAppCategory(app);
+    const version = getAppVersion(app);
+    const image = safeImageURL(getAppImage(app));
+    const download = getDownloadURL(app);
+    const appIndex = start + index;
+    const safeDownload = isSafeWebURL(download) ? download : "";
+
+    return `
+      <article class="app-card">
+        <button
+          class="app-image-wrap"
+          type="button"
+          data-open-app="${appIndex}"
+          aria-label="Ver detalles de ${escapeHTML(name)}"
+        >
+          <img
+            class="app-image"
+            src="${escapeHTML(image)}"
+            alt="${escapeHTML(name)}"
+            loading="lazy"
+            decoding="async"
+            onerror="this.onerror=null;this.style.opacity='0';"
+          >
+          <span class="image-overlay">
+            <span>Ver detalles ↗</span>
+          </span>
+        </button>
+
+        <div class="app-info">
+          <div class="app-meta">
+            <span class="app-category">${escapeHTML(getCategoryLabel(category))}</span>
+            <span class="app-version">${escapeHTML(version)}</span>
+          </div>
+
+          <h3 class="app-title" title="${escapeHTML(name)}">
+            ${escapeHTML(name)}
+          </h3>
+
+          <div class="app-actions">
+            ${
+              safeDownload
+                ? `<a
+                    class="download-link"
+                    href="${escapeHTML(safeDownload)}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >Descargar ↗</a>`
+                : `<button
+                    class="download-link"
+                    type="button"
+                    disabled
+                    title="No hay un enlace de descarga válido"
+                    style="opacity:.45;cursor:not-allowed"
+                  >Sin enlace</button>`
+            }
+
+            <button
+              class="share-link"
+              type="button"
+              data-share-app="${appIndex}"
+              aria-label="Compartir ${escapeHTML(name)}"
+              title="Compartir"
+            >↗</button>
+          </div>
+        </div>
+      </article>
+    `;
+  }).join("");
+
+  renderPagination(totalPages);
+}
+
+function renderPagination(totalPages) {
+  pagination.innerHTML = "";
+
+  if (totalPages <= 1) {
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+
+  function addButton(label, page, options = {}) {
+    const button = document.createElement("button");
+
+    button.type = "button";
+    button.className = "page-button";
+    button.textContent = label;
+    button.disabled = Boolean(options.disabled);
+
+    if (options.active) {
+      button.classList.add("active");
+      button.setAttribute("aria-current", "page");
+    }
+
+    button.setAttribute("aria-label", options.ariaLabel || `Página ${page}`);
+
+    button.addEventListener("click", () => {
+      if (page === currentPage || page < 1 || page > totalPages) {
+        return;
+      }
+
+      currentPage = page;
+      renderCatalog();
+
+      document.getElementById("catalogo").scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    });
+
+    fragment.appendChild(button);
+  }
+
+  function addEllipsis() {
+    const span = document.createElement("span");
+    span.className = "page-ellipsis";
+    span.textContent = "…";
+    span.setAttribute("aria-hidden", "true");
+    fragment.appendChild(span);
+  }
+
+  addButton("←", currentPage - 1, {
+    disabled: currentPage === 1,
+    ariaLabel: "Página anterior"
+  });
+
+  // Muestra un máximo de 5 números de página cuando el catálogo crece.
+  let pages = [];
+
+  if (totalPages <= 7) {
+    pages = Array.from({ length: totalPages }, (_, index) => index + 1);
+  } else {
+    const first = Math.max(2, currentPage - 1);
+    const last = Math.min(totalPages - 1, currentPage + 1);
+
+    pages = [1];
+
+    if (first > 2) {
+      pages.push("ellipsis-left");
+    }
+
+    for (let page = first; page <= last; page++) {
+      pages.push(page);
+    }
+
+    if (last < totalPages - 1) {
+      pages.push("ellipsis-right");
+    }
+
+    pages.push(totalPages);
+  }
+
+  pages.forEach(page => {
+    if (typeof page !== "number") {
+      addEllipsis();
+      return;
+    }
+
+    addButton(String(page), page, {
+      active: page === currentPage
+    });
+  });
+
+  addButton("→", currentPage + 1, {
+    disabled: currentPage === totalPages,
+    ariaLabel: "Página siguiente"
+  });
+
+  pagination.appendChild(fragment);
+}
+
+function openModal(app, updateURL = true) {
+  selectedApp = app;
+
+  const name = getAppName(app);
+  const image = safeImageURL(getAppImage(app));
+  const category = getAppCategory(app);
+  const version = getAppVersion(app);
+  const download = getDownloadURL(app);
+
+  modalTitle.textContent = name;
+  modalCategory.textContent = getCategoryLabel(category);
+  modalVersion.textContent = version ? `Versión ${version}` : "";
+  modalImage.src = image;
+  modalImage.alt = name;
+
+  if (isSafeWebURL(download)) {
+    downloadButton.href = download;
+    downloadButton.style.display = "inline-flex";
+  } else {
+    downloadButton.removeAttribute("href");
+    downloadButton.style.display = "none";
+  }
+
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+
+  if (updateURL) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("app", getAppSlug(app));
+    url.hash = "catalogo";
+    history.pushState({ app: getAppSlug(app) }, "", url);
+  }
+}
+
+function closeModal(updateURL = true) {
+  modal.classList.remove("open");
+  modal.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
+  selectedApp = null;
+
+  if (updateURL) {
+    const url = new URL(window.location.href);
+    url.searchParams.delete("app");
+    history.pushState({}, "", url);
+  }
+}
+
+async function shareApp(app) {
+  const url = getShareURL(app);
+  const title = getAppName(app);
+
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title,
+        text: `Mira ${title} en PKGX Store`,
+        url
+      });
+      return;
+    } catch (error) {
+      if (error.name === "AbortError") {
+        return;
+      }
+    }
+  }
+
+  try {
+    await navigator.clipboard.writeText(url);
+    alert("¡Enlace copiado! Ya puedes compartirlo.");
+  } catch {
+    window.prompt("Copia este enlace para compartir:", url);
+  }
+}
+
+searchInput.addEventListener("input", applyFilters);
+categoryFilter.addEventListener("change", applyFilters);
+
+grid.addEventListener("click", event => {
+  const openButton = event.target.closest("[data-open-app]");
+  const shareButtonElement = event.target.closest("[data-share-app]");
+
+  if (openButton) {
+    const index = Number(openButton.dataset.openApp);
+    const app = filteredApps[(currentPage - 1) * PAGE_SIZE + index -
+      (currentPage - 1) * PAGE_SIZE];
+
+    // El índice guardado en cada tarjeta es el de la lista filtrada.
+    const appIndex = Number(openButton.dataset.openApp);
+    if (filteredApps[appIndex]) {
+      openModal(filteredApps[appIndex]);
+    }
+  }
+
+  if (shareButtonElement) {
+    const index = Number(shareButtonElement.dataset.shareApp);
+    if (filteredApps[index]) {
+      shareApp(filteredApps[index]);
+    }
+  }
+});
+
+closeModalButton.addEventListener("click", () => closeModal());
+
+modal.addEventListener("click", event => {
+  if (event.target.matches("[data-close-modal]")) {
+    closeModal();
+  }
+});
+
+shareButton.addEventListener("click", () => {
+  if (selectedApp) {
+    shareApp(selectedApp);
+  }
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && modal.classList.contains("open")) {
+    closeModal();
+  }
+
+  if (
+    event.key === "/" &&
+    !["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName)
+  ) {
+    event.preventDefault();
+    searchInput.focus();
+  }
+});
+
+window.addEventListener("popstate", () => {
+  const slug = new URLSearchParams(window.location.search).get("app");
+
+  if (slug) {
+    const app = allApps.find(item => getAppSlug(item) === slug);
+    if (app) {
+      openModal(app, false);
+    }
+  } else if (modal.classList.contains("open")) {
+    closeModal(false);
+  }
+});
+
+document.getElementById("currentYear").textContent =
+  new Date().getFullYear();
 
 loadApps();
