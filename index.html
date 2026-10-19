@@ -1,169 +1,132 @@
+
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
-    <meta
-        name="google-site-verification"
-        content="Gsg02YKES8nmffacm-HUekW7cojT1oLdIx6sP7xKTgY"
-    >
-
-    <meta
-        name="description"
-        content="PKGX Store — aplicaciones, herramientas, utilidades y contenido para tu consola."
-    >
-
-    <meta
-        name="keywords"
-        content="PKGX Store, PS4, homebrew, aplicaciones, herramientas, utilidades, emuladores"
-    >
-
-    <meta
-        name="author"
-        content="PKGX Store"
-    >
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>PKGX Store</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-
-    <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
-
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080b10">
+  <meta name="description" content="Descubre y descarga aplicaciones y juegos en PKGX Store.">
+  <title>PKGX Store</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
 </head>
-
-
 <body>
-
-
-<header class="header">
-
-    <a
-        href="#"
-        class="logo"
-    >
-        PKGX<span>STORE</span>
+  <header class="header">
+    <a href="./" class="brand" aria-label="PKGX Store, inicio">
+      <span class="brand-icon">P</span>
+      <span>PKGX <span class="brand-accent">STORE</span></span>
     </a>
 
+    <a href="#catalogo" class="header-link">Explorar catálogo</a>
+  </header>
 
-    <nav class="header-links">
+  <main>
+    <section class="hero">
+      <span class="eyebrow">
+        <span class="status-dot"></span>
+        TU CATÁLOGO DIGITAL
+      </span>
 
-        <a href="#inicio">
-            Inicio
-        </a>
+      <h1>Todo lo que buscas,<br><span>en un solo lugar.</span></h1>
 
-        <a href="#apps">
-            Aplicaciones
-        </a>
+      <p>
+        Explora aplicaciones y juegos, descubre tus favoritos
+        y accede a sus enlaces de descarga.
+      </p>
 
-    </nav>
+      <a href="#catalogo" class="hero-button">
+        Explorar catálogo <span>↗</span>
+      </a>
+    </section>
 
-</header>
+    <section class="catalog-section" id="catalogo">
+      <div class="section-heading">
+        <div>
+          <span class="section-kicker">BIBLIOTECA</span>
+          <h2>Catálogo</h2>
+          <p class="section-subtitle">Encuentra tu próxima descarga.</p>
+        </div>
 
+        <span id="totalCount" class="total-count">Cargando...</span>
+      </div>
 
+      <div class="toolbar">
+        <label class="search-box">
+          <span class="search-icon" aria-hidden="true">⌕</span>
+          <input
+            type="search"
+            id="searchInput"
+            placeholder="Buscar aplicaciones o juegos..."
+            autocomplete="off"
+            aria-label="Buscar en el catálogo"
+          >
+          <kbd>/</kbd>
+        </label>
 
-<section
-    class="hero"
-    id="inicio"
->
+        <select id="categoryFilter" aria-label="Filtrar por categoría">
+          <option value="all">Todas las categorías</option>
+          <option value="android">Android</option>
+          <option value="pc">PC</option>
+          <option value="roms_isos_games">ROMs / ISOs / Games</option>
+        </select>
+      </div>
 
-    <div class="hero-content">
+      <div id="catalogStatus" class="catalog-status" role="status">
+        Cargando catálogo...
+      </div>
 
-        <small>
-            PKGX STORE
-        </small>
+      <div id="appsGrid" class="apps-grid"></div>
 
-        <h1>
-            Aplicaciones.<br>
-            <span>En un solo lugar.</span>
-        </h1>
+      <nav id="pagination" class="pagination" aria-label="Páginas del catálogo"></nav>
+    </section>
+  </main>
 
-        <p>
-            Explora aplicaciones, herramientas y utilidades
-            organizadas en un catálogo sencillo y moderno.
-        </p>
+  <footer class="footer">
+    <a href="./" class="footer-brand">PKGX STORE</a>
+    <p>Tu espacio para descubrir aplicaciones y juegos.</p>
+    <span>© <span id="currentYear"></span> PKGX Store</span>
+  </footer>
 
-        <a
-            href="#apps"
-            class="hero-button"
-        >
-            Explorar aplicaciones
-        </a>
+  <div
+    id="appModal"
+    class="modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modalTitle"
+    aria-hidden="true"
+  >
+    <div class="modal-backdrop" data-close-modal></div>
 
+    <div class="modal-content">
+      <button
+        id="closeModal"
+        class="modal-close"
+        type="button"
+        aria-label="Cerrar ventana"
+      >×</button>
+
+      <img id="modalImage" class="modal-image" src="" alt="">
+
+      <div class="modal-details">
+        <span id="modalCategory" class="modal-category"></span>
+        <h2 id="modalTitle">Aplicación</h2>
+        <p id="modalVersion" class="modal-version"></p>
+
+        <div class="modal-actions">
+          <a
+            id="downloadButton"
+            class="download-button"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Descargar ↗</a>
+
+          <button id="shareButton" class="share-button" type="button">
+            Compartir ↗
+          </button>
+        </div>
+      </div>
     </div>
-
-</section>
-
-
-
-<section
-    class="toolbar"
-    id="apps"
->
-
-    <input
-        id="searchInput"
-        type="search"
-        placeholder="Buscar una aplicación..."
-        autocomplete="off"
-    >
-
-
-    <select id="categoryFilter">
-
-        <option value="">
-            Todas las categorías
-        </option>
-
-    </select>
-
-</section>
-
-
-
-<main
-    id="appsGrid"
-    class="apps-grid"
->
-
-    <div class="loading">
-        Cargando aplicaciones...
-    </div>
-
-</main>
-
-
-
-<footer class="footer">
-
-    © 2026 PKGX Store · Aplicaciones y herramientas.
-
-</footer>
-
-
-
-<script src="script.js"></script>
-
+  </div>
 </body>
-
 </html>
