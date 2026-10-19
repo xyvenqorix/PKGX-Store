@@ -2,131 +2,614 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#080b10">
-  <meta name="description" content="Descubre y descarga aplicaciones y juegos en PKGX Store.">
-  <title>PKGX Store</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="script.js" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080b10">
+<meta name="description" content="Descubre aplicaciones y juegos en PKGX Store.">
+<title>PKGX Store</title>
+
+<style>
+:root {
+  --bg:#080b10;
+  --surface:#10151d;
+  --surface2:#151c26;
+  --border:#242d39;
+  --text:#f2f5f9;
+  --muted:#8d99a9;
+  --accent:#39ff88;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:85px}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:Inter,"Segoe UI",Arial,sans-serif;min-height:100vh
+}
+button,input,select{font:inherit}
+button,a{-webkit-tap-highlight-color:transparent}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer}
+.header{
+  height:66px;position:sticky;top:0;z-index:20;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 max(5%,calc((100% - 1200px)/2));
+  background:#080b10ed;backdrop-filter:blur(18px);
+  border-bottom:1px solid #ffffff0d
+}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:1px}
+.logo{
+  display:grid;place-items:center;width:35px;height:35px;
+  border-radius:10px;background:var(--accent);color:#07130c;font-size:22px
+}
+.green{color:var(--accent)}
+.nav{display:flex;align-items:center;gap:22px;font-size:12px;color:#bac4d0}
+.nav a:hover{color:var(--accent)}
+.hero{
+  padding:76px 20px 66px;text-align:center;
+  background:radial-gradient(ellipse at 50% 0,#16332355,transparent 65%)
+}
+.eyebrow{
+  display:inline-block;border:1px solid #39ff8833;background:#39ff880c;
+  padding:8px 12px;border-radius:30px;color:var(--accent);
+  font-size:10px;font-weight:800;letter-spacing:1.5px
+}
+.hero h1{font-size:clamp(37px,6vw,66px);letter-spacing:-2px;line-height:1.1;margin:23px 0 14px}
+.hero p{max-width:500px;margin:auto;color:var(--muted);font-size:14px;line-height:1.8}
+.primary{
+  display:inline-flex;justify-content:center;align-items:center;gap:9px;
+  padding:13px 18px;border:0;border-radius:10px;
+  background:var(--accent);color:#06120a;font-weight:800;font-size:12px
+}
+.hero .primary{margin-top:25px}
+.primary:hover{background:#73ffaa}
+.container{width:min(1200px,calc(100% - 40px));margin:auto}
+.catalog{padding:22px 0 65px}
+.heading{display:flex;justify-content:space-between;align-items:end;gap:15px;margin-bottom:22px}
+.kicker{color:var(--accent);font-size:10px;font-weight:800;letter-spacing:2px}
+h2{font-size:29px;margin:7px 0}
+.subtitle{font-size:12px;color:var(--muted);margin:0}
+.count{border:1px solid var(--border);background:var(--surface);border-radius:9px;padding:9px 11px;font-size:11px;color:#c5ced8;white-space:nowrap}
+.toolbar{display:flex;gap:11px;margin-bottom:22px}
+.search{
+  flex:1;display:flex;align-items:center;gap:10px;min-width:0;
+  padding:0 13px;border:1px solid var(--border);border-radius:11px;background:var(--surface)
+}
+.search:focus-within{border-color:#39ff8877}
+.search span{color:var(--accent);font-size:20px}
+.search input{width:100%;min-width:0;padding:14px 0;background:transparent;border:0;outline:0;color:var(--text);font-size:12px}
+.search input::placeholder{color:#778394}
+select{
+  max-width:220px;background:var(--surface);border:1px solid var(--border);
+  border-radius:11px;padding:0 12px;color:var(--text);font-size:12px;outline:0
+}
+.status{text-align:center;padding:20px 0;color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:19px}
+.card{min-width:0;cursor:pointer}
+.cover{
+  position:relative;aspect-ratio:4/3;overflow:hidden;
+  background:var(--surface);border:1px solid var(--border);border-radius:12px
+}
+.cover img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.card:hover .cover img{transform:scale(1.045)}
+.cover .placeholder{
+  display:grid;place-items:center;width:100%;height:100%;
+  color:var(--accent);font-size:35px;font-weight:900;
+  background:radial-gradient(ellipse at center,#1c3928,#10151d 70%)
+}
+.category{
+  display:inline-block;margin-top:11px;color:var(--accent);
+  font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase
+}
+.card h3{
+  font-size:13px;font-weight:750;margin:5px 0 0;line-height:1.5;
+  overflow-wrap:anywhere
+}
+.card:hover h3{color:var(--accent)}
+.pagination{display:flex;justify-content:center;align-items:center;gap:7px;flex-wrap:wrap;margin-top:32px}
+.page{
+  min-width:38px;height:38px;padding:0 10px;border:1px solid var(--border);
+  border-radius:9px;background:var(--surface);color:#d2dae4;font-size:12px
+}
+.page:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.page.active{background:var(--accent);color:#07130c;border-color:var(--accent);font-weight:900}
+.page:disabled{opacity:.35;cursor:not-allowed}
+.footer{border-top:1px solid var(--border);padding:28px 20px;text-align:center;color:var(--muted);font-size:11px}
+.footer strong{color:var(--accent);letter-spacing:1.5px}
+
+/* Página de detalles */
+.detail{padding:23px 0 65px}
+.breadcrumb{color:var(--muted);font-size:11px;margin-bottom:22px}
+.breadcrumb a:hover{color:var(--accent)}
+.detail-top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:20px}
+.detail-top h2{font-size:23px;margin:0;overflow-wrap:anywhere}
+.back{
+  border:1px solid var(--border);background:var(--surface);
+  color:var(--text);border-radius:9px;padding:10px 13px;font-size:11px;white-space:nowrap
+}
+.back:hover{border-color:var(--accent);color:var(--accent)}
+.detail-layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(240px,.8fr);gap:25px;align-items:start}
+.detail-poster{width:100%;aspect-ratio:16/10;object-fit:contain;background:#050608;border:1px solid var(--border);border-radius:13px}
+.detail-info{border:1px solid var(--border);background:var(--surface);border-radius:13px;padding:20px}
+.detail-info h3{font-size:16px;margin:0 0 15px}
+.info-row{padding:12px 0;border-bottom:1px solid var(--border);font-size:12px}
+.info-row:last-of-type{border-bottom:0}
+.info-row span{display:block;color:var(--muted);font-size:10px;margin-bottom:5px}
+.info-row strong{overflow-wrap:anywhere}
+.description{white-space:pre-wrap;color:#b7c1cd;font-size:13px;line-height:1.8;overflow-wrap:anywhere}
+.detail-actions{display:flex;gap:9px;margin-top:18px}
+.detail-actions>*{flex:1;text-align:center}
+.secondary{
+  display:inline-flex;justify-content:center;align-items:center;padding:12px;
+  border:1px solid var(--border);border-radius:10px;background:var(--surface2);
+  color:var(--text);font-size:12px;font-weight:750
+}
+.secondary:hover{border-color:var(--accent);color:var(--accent)}
+.hidden{display:none!important}
+@media(max-width:850px){
+  .grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+  .detail-layout{grid-template-columns:1fr}
+  .detail-info{max-width:none}
+}
+@media(max-width:560px){
+  .header{height:58px;padding:0 15px}
+  .logo{width:30px;height:30px;font-size:19px}
+  .brand{font-size:13px;gap:7px}
+  .nav{gap:12px;font-size:10px}
+  .nav .optional{display:none}
+  .hero{padding:59px 16px 48px}
+  .hero h1{letter-spacing:-1.5px}
+  .hero p{font-size:13px}
+  .container{width:calc(100% - 26px)}
+  .heading h2{font-size:25px}
+  .toolbar{flex-direction:column}
+  select{width:100%;max-width:none;height:43px}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:17px 12px}
+  .cover{border-radius:10px}
+  .card h3{font-size:12px}
+  .category{font-size:8px;margin-top:9px}
+  .detail-top{align-items:flex-start}
+  .detail-top h2{font-size:18px}
+  .detail-layout{gap:15px}
+  .detail-info{padding:16px}
+  .detail-actions{flex-wrap:wrap}
+  .page{min-width:34px;height:35px;padding:0 8px}
+}
+</style>
 </head>
+
 <body>
-  <header class="header">
-    <a href="./" class="brand" aria-label="PKGX Store, inicio">
-      <span class="brand-icon">P</span>
-      <span>PKGX <span class="brand-accent">STORE</span></span>
-    </a>
+<header class="header">
+  <a href="#/" class="brand" aria-label="Inicio PKGX Store">
+    <span class="logo">P</span>
+    <span>PKGX <span class="green">STORE</span></span>
+  </a>
+  <nav class="nav">
+    <a href="#/">Inicio</a>
+    <a href="#catalogo">Catálogo</a>
+    <a href="#catalogo" class="optional">Explorar</a>
+  </nav>
+</header>
 
-    <a href="#catalogo" class="header-link">Explorar catálogo</a>
-  </header>
+<section id="homeView">
+  <section class="hero">
+    <span class="eyebrow">TU BIBLIOTECA DIGITAL</span>
+    <h1>Descubre algo<br><span class="green">extraordinario.</span></h1>
+    <p>Explora aplicaciones y juegos en un catálogo sencillo, moderno y organizado.</p>
+    <a href="#catalogo" class="primary">Explorar catálogo ↗</a>
+  </section>
 
-  <main>
-    <section class="hero">
-      <span class="eyebrow">
-        <span class="status-dot"></span>
-        TU CATÁLOGO DIGITAL
-      </span>
-
-      <h1>Todo lo que buscas,<br><span>en un solo lugar.</span></h1>
-
-      <p>
-        Explora aplicaciones y juegos, descubre tus favoritos
-        y accede a sus enlaces de descarga.
-      </p>
-
-      <a href="#catalogo" class="hero-button">
-        Explorar catálogo <span>↗</span>
-      </a>
-    </section>
-
-    <section class="catalog-section" id="catalogo">
-      <div class="section-heading">
-        <div>
-          <span class="section-kicker">BIBLIOTECA</span>
-          <h2>Catálogo</h2>
-          <p class="section-subtitle">Encuentra tu próxima descarga.</p>
-        </div>
-
-        <span id="totalCount" class="total-count">Cargando...</span>
+  <main class="container catalog" id="catalogo">
+    <div class="heading">
+      <div>
+        <span class="kicker">BIBLIOTECA</span>
+        <h2>Catálogo</h2>
+        <p class="subtitle">Elige algo nuevo para descubrir.</p>
       </div>
-
-      <div class="toolbar">
-        <label class="search-box">
-          <span class="search-icon" aria-hidden="true">⌕</span>
-          <input
-            type="search"
-            id="searchInput"
-            placeholder="Buscar aplicaciones o juegos..."
-            autocomplete="off"
-            aria-label="Buscar en el catálogo"
-          >
-          <kbd>/</kbd>
-        </label>
-
-        <select id="categoryFilter" aria-label="Filtrar por categoría">
-          <option value="all">Todas las categorías</option>
-          <option value="android">Android</option>
-          <option value="pc">PC</option>
-          <option value="roms_isos_games">ROMs / ISOs / Games</option>
-        </select>
-      </div>
-
-      <div id="catalogStatus" class="catalog-status" role="status">
-        Cargando catálogo...
-      </div>
-
-      <div id="appsGrid" class="apps-grid"></div>
-
-      <nav id="pagination" class="pagination" aria-label="Páginas del catálogo"></nav>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <a href="./" class="footer-brand">PKGX STORE</a>
-    <p>Tu espacio para descubrir aplicaciones y juegos.</p>
-    <span>© <span id="currentYear"></span> PKGX Store</span>
-  </footer>
-
-  <div
-    id="appModal"
-    class="modal"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="modalTitle"
-    aria-hidden="true"
-  >
-    <div class="modal-backdrop" data-close-modal></div>
-
-    <div class="modal-content">
-      <button
-        id="closeModal"
-        class="modal-close"
-        type="button"
-        aria-label="Cerrar ventana"
-      >×</button>
-
-      <img id="modalImage" class="modal-image" src="" alt="">
-
-      <div class="modal-details">
-        <span id="modalCategory" class="modal-category"></span>
-        <h2 id="modalTitle">Aplicación</h2>
-        <p id="modalVersion" class="modal-version"></p>
-
-        <div class="modal-actions">
-          <a
-            id="downloadButton"
-            class="download-button"
-            href="#"
-            target="_blank"
-            rel="noopener noreferrer"
-          >Descargar ↗</a>
-
-          <button id="shareButton" class="share-button" type="button">
-            Compartir ↗
-          </button>
-        </div>
-      </div>
+      <span class="count" id="count">Cargando...</span>
     </div>
+
+    <div class="toolbar">
+      <label class="search">
+        <span>⌕</span>
+        <input id="search" type="search" placeholder="Buscar aplicaciones y juegos..." autocomplete="off">
+      </label>
+      <select id="category">
+        <option value="all">Todas las categorías</option>
+        <option value="android">Android</option>
+        <option value="pc">PC</option>
+        <option value="roms_isos_games">ROMs / ISOs / Games</option>
+      </select>
+    </div>
+
+    <div id="status" class="status">Conectando con el catálogo...</div>
+    <div id="grid" class="grid"></div>
+    <nav id="pages" class="pagination" aria-label="Paginación"></nav>
+  </main>
+</section>
+
+<main id="detailView" class="container detail hidden">
+  <div class="breadcrumb">
+    <a href="#/">Inicio</a> &nbsp;›&nbsp;
+    <a href="#catalogo">Catálogo</a> &nbsp;›&nbsp;
+    <span id="crumbName">Detalles</span>
   </div>
+
+  <div class="detail-top">
+    <h2 id="detailTitle">Aplicación</h2>
+    <a href="#catalogo" class="back">← Volver al catálogo</a>
+  </div>
+
+  <div class="detail-layout">
+    <div>
+      <img id="detailImage" class="detail-poster" alt="">
+      <h3 style="margin:20px 0 8px;font-size:16px">Información</h3>
+      <p id="detailDescription" class="description">No hay información adicional disponible.</p>
+    </div>
+
+    <aside class="detail-info">
+      <span id="detailCategory" class="category" style="margin:0 0 13px"></span>
+      <h3 id="infoTitle">Detalles de la aplicación</h3>
+
+      <div class="info-row">
+        <span>Nombre</span>
+        <strong id="infoName">—</strong>
+      </div>
+      <div class="info-row">
+        <span>Categoría</span>
+        <strong id="infoCategory">—</strong>
+      </div>
+      <div class="info-row">
+        <span>Versión</span>
+        <strong id="infoVersion">No especificada</strong>
+      </div>
+
+      <div class="detail-actions">
+        <a id="download" class="primary" href="#" target="_blank" rel="noopener noreferrer">Descargar ↗</a>
+        <button id="share" class="secondary" type="button">Compartir ↗</button>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<footer class="footer">
+  <strong>PKGX STORE</strong>
+  <p>Tu espacio para descubrir aplicaciones y juegos.</p>
+  <span>© <span id="year"></span> PKGX Store</span>
+</footer>
+
+<script>
+(() => {
+  "use strict";
+
+  // La API sigue en tu proyecto de Vercel.
+  const API_URL = "/api/apps";
+  const PAGE_SIZE = 12;
+
+  const $ = id => document.getElementById(id);
+
+  const homeView = $("homeView");
+  const detailView = $("detailView");
+  const grid = $("grid");
+  const pages = $("pages");
+  const search = $("search");
+  const category = $("category");
+  const status = $("status");
+
+  let allApps = [];
+  let filteredApps = [];
+  let currentPage = 1;
+  let currentApp = null;
+
+  const categoryLabels = {
+    android: "Android",
+    pc: "PC",
+    roms_isos_games: "ROMs / ISOs / Games"
+  };
+
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, c => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;",
+      '"': "&quot;", "'": "&#39;"
+    })[c]);
+  }
+
+  function nameOf(app) {
+    return app.name ?? app.title ?? "Sin nombre";
+  }
+
+  function imageOf(app) {
+    return app.image ?? app.imageUrl ?? app.imageURL ?? app.photo ?? "";
+  }
+
+  function categoryOf(app) {
+    return app.category ?? app.platform ?? "android";
+  }
+
+  function versionOf(app) {
+    return app.version ?? "";
+  }
+
+  function urlOf(app) {
+    return app.url ?? app.downloadUrl ?? app.downloadURL ?? app.link ?? "";
+  }
+
+  function descriptionOf(app) {
+    return app.description ?? app.info ?? app.details ?? "";
+  }
+
+  function slugOf(app) {
+    return String(app.slug || nameOf(app))
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase().replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+  }
+
+  function labelOf(value) {
+    return categoryLabels[String(value).toLowerCase()] || String(value || "Aplicación");
+  }
+
+  function safeURL(value) {
+    try {
+      const u = new URL(value, location.origin);
+      return ["http:", "https:"].includes(u.protocol) ? u.href : "";
+    } catch {
+      return "";
+    }
+  }
+
+  function appURL(app) {
+    return location.origin + location.pathname + "#app=" + encodeURIComponent(slugOf(app));
+  }
+
+  async function loadApps() {
+    status.textContent = "Cargando catálogo...";
+    try {
+      const response = await fetch(API_URL, {
+        headers: { Accept: "application/json" }
+      });
+
+      if (!response.ok) throw new Error("HTTP " + response.status);
+
+      const data = await response.json();
+      const list = Array.isArray(data) ? data
+        : Array.isArray(data.apps) ? data.apps
+        : Array.isArray(data.titles) ? data.titles
+        : null;
+
+      if (!list) throw new Error("La API no devolvió una lista");
+
+      allApps = list;
+      filterApps();
+      route();
+    } catch (error) {
+      console.error(error);
+      $("count").textContent = "Sin datos";
+      status.textContent =
+        "No se pudo cargar el catálogo. Comprueba que /api/apps devuelva las aplicaciones en JSON.";
+    }
+  }
+
+  function filterApps() {
+    const query = search.value.trim().toLocaleLowerCase();
+    const selected = category.value.toLowerCase();
+
+    filteredApps = allApps.filter(app => {
+      const matchesName = nameOf(app).toLocaleLowerCase().includes(query);
+      const matchesCategory = selected === "all" ||
+        String(categoryOf(app)).toLowerCase() === selected;
+      return matchesName && matchesCategory;
+    });
+
+    currentPage = 1;
+    renderCatalog();
+  }
+
+  function renderCatalog() {
+    const total = filteredApps.length;
+    const totalPages = Math.ceil(total / PAGE_SIZE);
+
+    $("count").textContent = total + (total === 1 ? " resultado" : " resultados");
+
+    if (!total) {
+      grid.innerHTML = "";
+      pages.innerHTML = "";
+      status.textContent = allApps.length
+        ? "No encontramos resultados con esa búsqueda."
+        : "Todavía no hay aplicaciones en el catálogo.";
+      return;
+    }
+
+    status.textContent = "";
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const list = filteredApps.slice(start, start + PAGE_SIZE);
+
+    grid.innerHTML = list.map((app, index) => {
+      const image = safeURL(imageOf(app));
+      const categoryName = labelOf(categoryOf(app));
+      const initial = escapeHTML(nameOf(app).trim().charAt(0).toUpperCase() || "P");
+
+      return `
+        <article class="card" tabindex="0" role="link"
+          data-index="${start + index}"
+          aria-label="Ver detalles de ${escapeHTML(nameOf(app))}">
+          <div class="cover">
+            ${
+              image
+                ? `<img src="${escapeHTML(image)}" alt="" loading="lazy"
+                    onerror="this.style.display='none';this.nextElementSibling.classList.remove('hidden')">
+                   <div class="placeholder hidden">${initial}</div>`
+                : `<div class="placeholder">${initial}</div>`
+            }
+          </div>
+          <div class="category">${escapeHTML(categoryName)}</div>
+          <h3>${escapeHTML(nameOf(app))}</h3>
+        </article>
+      `;
+    }).join("");
+
+    renderPages(totalPages);
+  }
+
+  function renderPages(totalPages) {
+    pages.innerHTML = "";
+    if (totalPages <= 1) return;
+
+    function add(label, page, active, disabled) {
+      const button = document.createElement("button");
+      button.className = "page" + (active ? " active" : "");
+      button.type = "button";
+      button.textContent = label;
+      button.disabled = disabled;
+      if (active) button.setAttribute("aria-current", "page");
+
+      button.addEventListener("click", () => {
+        if (page < 1 || page > totalPages || page === currentPage) return;
+        currentPage = page;
+        renderCatalog();
+        $("catalogo").scrollIntoView({ behavior: "smooth" });
+      });
+
+      pages.appendChild(button);
+    }
+
+    add("←", currentPage - 1, false, currentPage === 1);
+
+    let numbers;
+    if (totalPages <= 7) {
+      numbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+    } else {
+      numbers = [...new Set([
+        1, currentPage - 1, currentPage,
+        currentPage + 1, totalPages
+      ])].filter(n => n >= 1 && n <= totalPages).sort((a,b) => a-b);
+    }
+
+    let previous = 0;
+    for (const n of numbers) {
+      if (n - previous > 1) {
+        const dots = document.createElement("span");
+        dots.textContent = "…";
+        dots.style.color = "var(--muted)";
+        pages.appendChild(dots);
+      }
+      add(String(n), n, n === currentPage, false);
+      previous = n;
+    }
+
+    add("→", currentPage + 1, false, currentPage === totalPages);
+  }
+
+  function openApp(app) {
+    currentApp = app;
+    location.hash = "app=" + encodeURIComponent(slugOf(app));
+  }
+
+  function showDetails(app) {
+    currentApp = app;
+    homeView.classList.add("hidden");
+    detailView.classList.remove("hidden");
+
+    const name = nameOf(app);
+    const cat = labelOf(categoryOf(app));
+    const image = safeURL(imageOf(app));
+    const downloadURL = safeURL(urlOf(app));
+
+    $("detailTitle").textContent = name;
+    $("crumbName").textContent = name;
+    $("detailImage").src = image || "";
+    $("detailImage").alt = name;
+    $("detailImage").style.display = image ? "block" : "none";
+
+    $("detailCategory").textContent = cat;
+    $("infoTitle").textContent = "Detalles de la aplicación";
+    $("infoName").textContent = name;
+    $("infoCategory").textContent = cat;
+    $("infoVersion").textContent = versionOf(app) || "No especificada";
+    $("detailDescription").textContent =
+      descriptionOf(app) || "No hay información adicional disponible.";
+
+    const download = $("download");
+    if (downloadURL) {
+      download.href = downloadURL;
+      download.classList.remove("hidden");
+    } else {
+      download.removeAttribute("href");
+      download.classList.add("hidden");
+    }
+
+    window.scrollTo({ top: 0, behavior: "instant" });
+    document.title = name + " | PKGX Store";
+  }
+
+  function route() {
+    const hash = location.hash;
+    if (hash.startsWith("#app=")) {
+      let slug = "";
+      try {
+        slug = decodeURIComponent(hash.slice(5));
+      } catch {
+        slug = hash.slice(5);
+      }
+
+      const app = allApps.find(item => slugOf(item) === slug);
+      if (app) {
+        showDetails(app);
+        return;
+      }
+    }
+
+    currentApp = null;
+    detailView.classList.add("hidden");
+    homeView.classList.remove("hidden");
+    document.title = "PKGX Store";
+  }
+
+  async function shareCurrent() {
+    if (!currentApp) return;
+    const url = appURL(currentApp);
+    const data = {
+      title: nameOf(currentApp) + " | PKGX Store",
+      text: "Mira " + nameOf(currentApp) + " en PKGX Store",
+      url
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(data);
+        return;
+      } catch (error) {
+        if (error.name === "AbortError") return;
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(url);
+      alert("¡Enlace copiado! Ya puedes compartirlo.");
+    } catch {
+      prompt("Copia este enlace:", url);
+    }
+  }
+
+  grid.addEventListener("click", event => {
+    const card = event.target.closest("[data-index]");
+    if (card) openApp(filteredApps[Number(card.dataset.index)]);
+  });
+
+  grid.addEventListener("keydown", event => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    const card = event.target.closest("[data-index]");
+    if (!card) return;
+    event.preventDefault();
+    openApp(filteredApps[Number(card.dataset.index)]);
+  });
+
+  search.addEventListener("input", filterApps);
+  category.addEventListener("change", filterApps);
+  $("share").addEventListener("click", shareCurrent);
+  window.addEventListener("hashchange", route);
+  $("year").textContent = new Date().getFullYear();
+
+  loadApps();
+})();
+</script>
 </body>
 </html>
