@@ -3,612 +3,358 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#080b10">
-<meta name="description" content="Descubre aplicaciones y juegos en PKGX Store.">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090c11">
+<meta name="description" content="PKGX Store: Emulators, Tools, Utilities y Homebrew.">
 <title>PKGX Store</title>
-
 <style>
-:root {
-  --bg:#080b10;
-  --surface:#10151d;
-  --surface2:#151c26;
-  --border:#242d39;
-  --text:#f2f5f9;
-  --muted:#8d99a9;
-  --accent:#39ff88;
-}
+:root{--bg:#090c11;--panel:#11151d;--border:#242a35;--text:#edf0f5;--muted:#929baa;--green:#39ff88}
 *{box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:85px}
-body{
-  margin:0;background:var(--bg);color:var(--text);
-  font-family:Inter,"Segoe UI",Arial,sans-serif;min-height:100vh
-}
-button,input,select{font:inherit}
-button,a{-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;scroll-padding-top:75px}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,"Segoe UI",sans-serif}
 a{color:inherit;text-decoration:none}
+button,input,select{font:inherit}
 button{cursor:pointer}
-.header{
-  height:66px;position:sticky;top:0;z-index:20;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 max(5%,calc((100% - 1200px)/2));
-  background:#080b10ed;backdrop-filter:blur(18px);
-  border-bottom:1px solid #ffffff0d
-}
-.brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:1px}
-.logo{
-  display:grid;place-items:center;width:35px;height:35px;
-  border-radius:10px;background:var(--accent);color:#07130c;font-size:22px
-}
-.green{color:var(--accent)}
-.nav{display:flex;align-items:center;gap:22px;font-size:12px;color:#bac4d0}
-.nav a:hover{color:var(--accent)}
-.hero{
-  padding:76px 20px 66px;text-align:center;
-  background:radial-gradient(ellipse at 50% 0,#16332355,transparent 65%)
-}
-.eyebrow{
-  display:inline-block;border:1px solid #39ff8833;background:#39ff880c;
-  padding:8px 12px;border-radius:30px;color:var(--accent);
-  font-size:10px;font-weight:800;letter-spacing:1.5px
-}
-.hero h1{font-size:clamp(37px,6vw,66px);letter-spacing:-2px;line-height:1.1;margin:23px 0 14px}
-.hero p{max-width:500px;margin:auto;color:var(--muted);font-size:14px;line-height:1.8}
-.primary{
-  display:inline-flex;justify-content:center;align-items:center;gap:9px;
-  padding:13px 18px;border:0;border-radius:10px;
-  background:var(--accent);color:#06120a;font-weight:800;font-size:12px
-}
-.hero .primary{margin-top:25px}
-.primary:hover{background:#73ffaa}
-.container{width:min(1200px,calc(100% - 40px));margin:auto}
-.catalog{padding:22px 0 65px}
-.heading{display:flex;justify-content:space-between;align-items:end;gap:15px;margin-bottom:22px}
-.kicker{color:var(--accent);font-size:10px;font-weight:800;letter-spacing:2px}
-h2{font-size:29px;margin:7px 0}
-.subtitle{font-size:12px;color:var(--muted);margin:0}
-.count{border:1px solid var(--border);background:var(--surface);border-radius:9px;padding:9px 11px;font-size:11px;color:#c5ced8;white-space:nowrap}
-.toolbar{display:flex;gap:11px;margin-bottom:22px}
-.search{
-  flex:1;display:flex;align-items:center;gap:10px;min-width:0;
-  padding:0 13px;border:1px solid var(--border);border-radius:11px;background:var(--surface)
-}
-.search:focus-within{border-color:#39ff8877}
-.search span{color:var(--accent);font-size:20px}
-.search input{width:100%;min-width:0;padding:14px 0;background:transparent;border:0;outline:0;color:var(--text);font-size:12px}
-.search input::placeholder{color:#778394}
-select{
-  max-width:220px;background:var(--surface);border:1px solid var(--border);
-  border-radius:11px;padding:0 12px;color:var(--text);font-size:12px;outline:0
-}
-.status{text-align:center;padding:20px 0;color:var(--muted);font-size:13px}
-.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:19px}
+.hidden{display:none!important}
+header{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:22px;min-height:58px;padding:10px max(4%,calc((100% - 1250px)/2));background:#090c11f2;border-bottom:1px solid #ffffff10;backdrop-filter:blur(15px)}
+.brand{font-weight:900;letter-spacing:1px;white-space:nowrap;font-size:17px}
+.brand span{color:var(--green)}
+nav{display:flex;align-items:center;gap:17px;font-size:11px;color:#b9c1ce;white-space:nowrap}
+nav a:hover{color:var(--green)}
+.header-search{margin-left:auto;width:min(290px,35%);display:flex;align-items:center;gap:8px;background:#171c26;border:1px solid #252b37;border-radius:10px;padding:0 11px}
+.header-search span{color:var(--muted)}
+.header-search input{width:100%;min-width:0;background:transparent;color:white;border:0;outline:0;padding:11px 0;font-size:12px}
+main{width:min(1200px,calc(100% - 36px));margin:auto}
+.intro{padding:32px 0 22px}
+.intro h1{font-size:clamp(24px,4vw,36px);letter-spacing:-1px;margin:0 0 8px}
+.intro h1 span{color:var(--green)}
+.intro p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}
+.catalog-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:14px 0 16px}
+.catalog-head h2{margin:0;font-size:21px}
+.count{color:var(--muted);font-size:11px;white-space:nowrap}
+.filters{display:flex;gap:8px;overflow-x:auto;padding:2px 0 13px;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.filter{flex-shrink:0;border:1px solid var(--border);border-radius:9px;background:var(--panel);color:#c2cad6;padding:9px 13px;font-size:11px}
+.filter.active,.filter:hover{background:#39ff8812;border-color:#39ff8870;color:var(--green)}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:19px 15px}
 .card{min-width:0;cursor:pointer}
-.cover{
-  position:relative;aspect-ratio:4/3;overflow:hidden;
-  background:var(--surface);border:1px solid var(--border);border-radius:12px
-}
-.cover img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .3s}
-.card:hover .cover img{transform:scale(1.045)}
-.cover .placeholder{
-  display:grid;place-items:center;width:100%;height:100%;
-  color:var(--accent);font-size:35px;font-weight:900;
-  background:radial-gradient(ellipse at center,#1c3928,#10151d 70%)
-}
-.category{
-  display:inline-block;margin-top:11px;color:var(--accent);
-  font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase
-}
-.card h3{
-  font-size:13px;font-weight:750;margin:5px 0 0;line-height:1.5;
-  overflow-wrap:anywhere
-}
-.card:hover h3{color:var(--accent)}
-.pagination{display:flex;justify-content:center;align-items:center;gap:7px;flex-wrap:wrap;margin-top:32px}
-.page{
-  min-width:38px;height:38px;padding:0 10px;border:1px solid var(--border);
-  border-radius:9px;background:var(--surface);color:#d2dae4;font-size:12px
-}
-.page:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
-.page.active{background:var(--accent);color:#07130c;border-color:var(--accent);font-weight:900}
+.cover{aspect-ratio:4/3;border:1px solid var(--border);border-radius:11px;overflow:hidden;background:#121721}
+.cover img{width:100%;height:100%;display:block;object-fit:cover;transition:transform .25s}
+.card:hover .cover img{transform:scale(1.04)}
+.placeholder{height:100%;display:grid;place-items:center;background:radial-gradient(ellipse,#1b3828,#10141c);color:var(--green);font-size:35px;font-weight:900}
+.category{display:block;margin-top:9px;color:var(--green);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px}
+.card h3{font-size:13px;line-height:1.5;margin:5px 0 0;overflow-wrap:anywhere}
+.card:hover h3{color:var(--green)}
+.status{text-align:center;padding:24px 0;color:var(--muted);font-size:12px}
+.pagination{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:6px;margin:28px 0 45px}
+.page{min-width:36px;height:36px;border:1px solid var(--border);border-radius:8px;background:var(--panel);color:var(--text);font-size:12px}
+.page.active{background:var(--green);color:#07130c;border-color:var(--green);font-weight:bold}
 .page:disabled{opacity:.35;cursor:not-allowed}
-.footer{border-top:1px solid var(--border);padding:28px 20px;text-align:center;color:var(--muted);font-size:11px}
-.footer strong{color:var(--accent);letter-spacing:1.5px}
+footer{border-top:1px solid var(--border);padding:24px 15px;text-align:center;color:var(--muted);font-size:11px}
+footer strong{color:var(--green);letter-spacing:1px}
 
-/* Página de detalles */
-.detail{padding:23px 0 65px}
-.breadcrumb{color:var(--muted);font-size:11px;margin-bottom:22px}
-.breadcrumb a:hover{color:var(--accent)}
-.detail-top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:20px}
-.detail-top h2{font-size:23px;margin:0;overflow-wrap:anywhere}
-.back{
-  border:1px solid var(--border);background:var(--surface);
-  color:var(--text);border-radius:9px;padding:10px 13px;font-size:11px;white-space:nowrap
-}
-.back:hover{border-color:var(--accent);color:var(--accent)}
-.detail-layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(240px,.8fr);gap:25px;align-items:start}
-.detail-poster{width:100%;aspect-ratio:16/10;object-fit:contain;background:#050608;border:1px solid var(--border);border-radius:13px}
-.detail-info{border:1px solid var(--border);background:var(--surface);border-radius:13px;padding:20px}
-.detail-info h3{font-size:16px;margin:0 0 15px}
+/* Detalles de cada aplicación */
+.detail{padding:22px 0 55px}
+.crumb{font-size:11px;color:var(--muted);margin-bottom:20px}
+.crumb a:hover{color:var(--green)}
+.detail-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+.detail-heading h2{margin:0;font-size:clamp(19px,3vw,27px);overflow-wrap:anywhere}
+.back,.share{border:1px solid var(--border);border-radius:9px;background:var(--panel);color:var(--text);padding:10px 12px;font-size:11px;white-space:nowrap}
+.back:hover,.share:hover{border-color:var(--green);color:var(--green)}
+.detail-layout{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(240px,.8fr);gap:22px;align-items:start}
+.poster{display:block;width:100%;max-height:500px;aspect-ratio:16/10;object-fit:contain;background:#030405;border:1px solid var(--border);border-radius:12px}
+.description-title{font-size:16px;margin:22px 0 8px}
+.description{color:#b7c0cd;font-size:13px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere}
+.info{padding:18px;border:1px solid var(--border);border-radius:12px;background:var(--panel)}
+.info h3{font-size:15px;margin:0 0 12px}
 .info-row{padding:12px 0;border-bottom:1px solid var(--border);font-size:12px}
-.info-row:last-of-type{border-bottom:0}
+.info-row:last-of-type{border:0}
 .info-row span{display:block;color:var(--muted);font-size:10px;margin-bottom:5px}
 .info-row strong{overflow-wrap:anywhere}
-.description{white-space:pre-wrap;color:#b7c1cd;font-size:13px;line-height:1.8;overflow-wrap:anywhere}
-.detail-actions{display:flex;gap:9px;margin-top:18px}
-.detail-actions>*{flex:1;text-align:center}
-.secondary{
-  display:inline-flex;justify-content:center;align-items:center;padding:12px;
-  border:1px solid var(--border);border-radius:10px;background:var(--surface2);
-  color:var(--text);font-size:12px;font-weight:750
+.actions{display:flex;gap:8px;margin-top:18px}
+.download{flex:1;text-align:center;padding:12px 9px;border-radius:9px;background:var(--green);color:#07130c;font-weight:bold;font-size:12px}
+.actions .share{flex:1}
+@media(min-width:1100px){.grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media(max-width:760px){
+ header{gap:12px;padding:9px 13px;min-height:55px}
+ .brand{font-size:14px}
+ nav{gap:10px;font-size:10px}
+ nav .optional{display:none}
+ .header-search{width:auto;flex:1;min-width:90px}
+ .header-search input{font-size:11px;padding:10px 0}
+ main{width:calc(100% - 26px)}
+ .intro{padding:23px 0 12px}
+ .intro h1{font-size:25px}
+ .intro p{font-size:12px}
+ .catalog-head{margin:12px 0}
+ .grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 11px}
+ .detail-layout{grid-template-columns:1fr}
 }
-.secondary:hover{border-color:var(--accent);color:var(--accent)}
-.hidden{display:none!important}
-@media(max-width:850px){
-  .grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
-  .detail-layout{grid-template-columns:1fr}
-  .detail-info{max-width:none}
-}
-@media(max-width:560px){
-  .header{height:58px;padding:0 15px}
-  .logo{width:30px;height:30px;font-size:19px}
-  .brand{font-size:13px;gap:7px}
-  .nav{gap:12px;font-size:10px}
-  .nav .optional{display:none}
-  .hero{padding:59px 16px 48px}
-  .hero h1{letter-spacing:-1.5px}
-  .hero p{font-size:13px}
-  .container{width:calc(100% - 26px)}
-  .heading h2{font-size:25px}
-  .toolbar{flex-direction:column}
-  select{width:100%;max-width:none;height:43px}
-  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:17px 12px}
-  .cover{border-radius:10px}
-  .card h3{font-size:12px}
-  .category{font-size:8px;margin-top:9px}
-  .detail-top{align-items:flex-start}
-  .detail-top h2{font-size:18px}
-  .detail-layout{gap:15px}
-  .detail-info{padding:16px}
-  .detail-actions{flex-wrap:wrap}
-  .page{min-width:34px;height:35px;padding:0 8px}
+@media(max-width:480px){
+ header{gap:9px}
+ .brand{font-size:12px;letter-spacing:.4px}
+ nav{gap:8px}
+ nav a{font-size:9px}
+ .header-search{padding:0 7px;gap:5px}
+ .header-search input{font-size:10px}
+ .intro{padding-top:20px}
+ .intro h1{font-size:23px}
+ .intro p{max-width:340px}
+ .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 12px}
+ .cover{aspect-ratio:4/3}
+ .card h3{font-size:12px}
+ .category{font-size:8px}
+ .detail-heading{align-items:flex-start}
+ .detail-heading h2{font-size:18px}
+ .back{font-size:10px;padding:9px}
+ .info{padding:15px}
 }
 </style>
 </head>
-
 <body>
-<header class="header">
-  <a href="#/" class="brand" aria-label="Inicio PKGX Store">
-    <span class="logo">P</span>
-    <span>PKGX <span class="green">STORE</span></span>
-  </a>
-  <nav class="nav">
+
+<header>
+  <a class="brand" href="#/">PKGX <span>STORE</span></a>
+  <nav>
     <a href="#/">Inicio</a>
-    <a href="#catalogo">Catálogo</a>
+    <a href="#catalogo">Apps</a>
     <a href="#catalogo" class="optional">Explorar</a>
   </nav>
+  <label class="header-search">
+    <span>⌕</span>
+    <input id="search" type="search" placeholder="Buscar..." aria-label="Buscar aplicaciones">
+  </label>
 </header>
 
-<section id="homeView">
-  <section class="hero">
-    <span class="eyebrow">TU BIBLIOTECA DIGITAL</span>
-    <h1>Descubre algo<br><span class="green">extraordinario.</span></h1>
-    <p>Explora aplicaciones y juegos en un catálogo sencillo, moderno y organizado.</p>
-    <a href="#catalogo" class="primary">Explorar catálogo ↗</a>
-  </section>
-
-  <main class="container catalog" id="catalogo">
-    <div class="heading">
-      <div>
-        <span class="kicker">BIBLIOTECA</span>
-        <h2>Catálogo</h2>
-        <p class="subtitle">Elige algo nuevo para descubrir.</p>
+<section id="home">
+  <main>
+    <section class="intro">
+      <h1>Explora el catálogo <span>PKGX.</span></h1>
+      <p>Emulators, Tools, Utilities y Homebrew en un solo lugar.</p>
+    </section>
+    <section id="catalogo">
+      <div class="catalog-head">
+        <h2>Aplicaciones</h2>
+        <span class="count" id="count">Cargando...</span>
       </div>
-      <span class="count" id="count">Cargando...</span>
-    </div>
-
-    <div class="toolbar">
-      <label class="search">
-        <span>⌕</span>
-        <input id="search" type="search" placeholder="Buscar aplicaciones y juegos..." autocomplete="off">
-      </label>
-      <select id="category">
-        <option value="all">Todas las categorías</option>
-        <option value="android">Android</option>
-        <option value="pc">PC</option>
-        <option value="roms_isos_games">ROMs / ISOs / Games</option>
-      </select>
-    </div>
-
-    <div id="status" class="status">Conectando con el catálogo...</div>
-    <div id="grid" class="grid"></div>
-    <nav id="pages" class="pagination" aria-label="Paginación"></nav>
+      <div class="filters" id="filters">
+        <button class="filter active" data-category="all">Todas</button>
+        <button class="filter" data-category="emulators">Emulators</button>
+        <button class="filter" data-category="tools">Tools</button>
+        <button class="filter" data-category="utilities">Utilities</button>
+        <button class="filter" data-category="homebrew">Homebrew</button>
+      </div>
+      <div class="status" id="status">Cargando aplicaciones...</div>
+      <div class="grid" id="grid"></div>
+      <nav class="pagination" id="pages" aria-label="Páginas"></nav>
+    </section>
   </main>
 </section>
 
-<main id="detailView" class="container detail hidden">
-  <div class="breadcrumb">
-    <a href="#/">Inicio</a> &nbsp;›&nbsp;
-    <a href="#catalogo">Catálogo</a> &nbsp;›&nbsp;
-    <span id="crumbName">Detalles</span>
+<main id="detail" class="detail hidden">
+  <div class="crumb"><a href="#/">Inicio</a> › <a href="#catalogo">Aplicaciones</a> › <span id="crumbName"></span></div>
+  <div class="detail-heading">
+    <h2 id="detailTitle"></h2>
+    <a href="#catalogo" class="back">← Volver</a>
   </div>
-
-  <div class="detail-top">
-    <h2 id="detailTitle">Aplicación</h2>
-    <a href="#catalogo" class="back">← Volver al catálogo</a>
-  </div>
-
   <div class="detail-layout">
-    <div>
-      <img id="detailImage" class="detail-poster" alt="">
-      <h3 style="margin:20px 0 8px;font-size:16px">Información</h3>
-      <p id="detailDescription" class="description">No hay información adicional disponible.</p>
-    </div>
-
-    <aside class="detail-info">
-      <span id="detailCategory" class="category" style="margin:0 0 13px"></span>
-      <h3 id="infoTitle">Detalles de la aplicación</h3>
-
-      <div class="info-row">
-        <span>Nombre</span>
-        <strong id="infoName">—</strong>
-      </div>
-      <div class="info-row">
-        <span>Categoría</span>
-        <strong id="infoCategory">—</strong>
-      </div>
-      <div class="info-row">
-        <span>Versión</span>
-        <strong id="infoVersion">No especificada</strong>
-      </div>
-
-      <div class="detail-actions">
-        <a id="download" class="primary" href="#" target="_blank" rel="noopener noreferrer">Descargar ↗</a>
-        <button id="share" class="secondary" type="button">Compartir ↗</button>
+    <section>
+      <img id="poster" class="poster" alt="">
+      <h3 class="description-title">Información</h3>
+      <div id="description" class="description"></div>
+    </section>
+    <aside class="info">
+      <span id="detailCategory" class="category" style="margin:0 0 12px"></span>
+      <h3>Detalles de la aplicación</h3>
+      <div class="info-row"><span>Nombre</span><strong id="infoName"></strong></div>
+      <div class="info-row"><span>Categoría</span><strong id="infoCategory"></strong></div>
+      <div class="info-row"><span>Versión</span><strong id="infoVersion"></strong></div>
+      <div class="actions">
+        <a id="download" class="download" target="_blank" rel="noopener noreferrer">Descargar ↗</a>
+        <button id="share" class="share">Compartir ↗</button>
       </div>
     </aside>
   </div>
 </main>
 
-<footer class="footer">
-  <strong>PKGX STORE</strong>
-  <p>Tu espacio para descubrir aplicaciones y juegos.</p>
-  <span>© <span id="year"></span> PKGX Store</span>
-</footer>
+<footer><strong>PKGX STORE</strong><p>© <span id="year"></span> PKGX Store</p></footer>
 
 <script>
 (() => {
-  "use strict";
+"use strict";
+const API_URL="/api/apps";
+const PAGE_SIZE=12;
+const $=id=>document.getElementById(id);
+let apps=[],filtered=[],page=1,activeApp=null,selectedCategory="all";
 
-  // La API sigue en tu proyecto de Vercel.
-  const API_URL = "/api/apps";
-  const PAGE_SIZE = 12;
+const labels={
+ emulators:"Emulators",
+ tools:"Tools",
+ utilities:"Utilities",
+ homebrew:"Homebrew"
+};
 
-  const $ = id => document.getElementById(id);
+function esc(v){
+ return String(v??"").replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ })[c]);
+}
+function name(a){return a.name??a.title??"Sin nombre"}
+function image(a){return a.image??a.imageUrl??a.imageURL??a.photo??""}
+function cat(a){return String(a.category??a.platform??"").toLowerCase().replace(/[\s-]+/g,"_")}
+function version(a){return a.version??""}
+function url(a){return a.url??a.downloadUrl??a.downloadURL??a.link??""}
+function info(a){return a.description??a.info??a.details??""}
+function categoryLabel(c){return labels[String(c).toLowerCase().replace(/[\s-]+/g,"_")]||String(c||"Aplicación")}
+function slug(a){
+ return String(a.slug||name(a)).normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+ .toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+}
+function safeURL(v){
+ try{const u=new URL(v,location.origin);return ["https:","http:"].includes(u.protocol)?u.href:""}
+ catch{return ""}
+}
+function shareURL(a){return location.href.split("#")[0]+"#app="+encodeURIComponent(slug(a))}
 
-  const homeView = $("homeView");
-  const detailView = $("detailView");
-  const grid = $("grid");
-  const pages = $("pages");
-  const search = $("search");
-  const category = $("category");
-  const status = $("status");
+async function load(){
+ try{
+  const r=await fetch(API_URL,{headers:{Accept:"application/json"}});
+  if(!r.ok)throw Error("API "+r.status);
+  const d=await r.json();
+  const list=Array.isArray(d)?d:Array.isArray(d.apps)?d.apps:Array.isArray(d.titles)?d.titles:null;
+  if(!list)throw Error("Respuesta JSON inesperada");
+  apps=list;
+  filterApps();
+  route();
+ }catch(e){
+  console.error(e);
+  $("count").textContent="Error";
+  $("status").textContent="No se pudo cargar el catálogo. Comprueba /api/apps y su respuesta JSON.";
+ }
+}
 
-  let allApps = [];
-  let filteredApps = [];
-  let currentPage = 1;
-  let currentApp = null;
+function filterApps(){
+ const q=$("search").value.trim().toLocaleLowerCase();
+ filtered=apps.filter(a=>{
+  const c=cat(a);
+  const matchesCategory=selectedCategory==="all"||c===selectedCategory;
+  const matchesSearch=name(a).toLocaleLowerCase().includes(q);
+  return matchesCategory&&matchesSearch;
+ });
+ page=1;
+ render();
+}
 
-  const categoryLabels = {
-    android: "Android",
-    pc: "PC",
-    roms_isos_games: "ROMs / ISOs / Games"
-  };
+function render(){
+ const total=filtered.length,totalPages=Math.ceil(total/PAGE_SIZE);
+ $("count").textContent=total+(total===1?" aplicación":" aplicaciones");
+ if(!total){
+  $("grid").innerHTML="";
+  $("pages").innerHTML="";
+  $("status").textContent=apps.length?"No hay aplicaciones en esta categoría.":"Todavía no hay aplicaciones.";
+  return;
+ }
+ $("status").textContent="";
+ const start=(page-1)*PAGE_SIZE;
+ $("grid").innerHTML=filtered.slice(start,start+PAGE_SIZE).map((a,i)=>{
+  const im=safeURL(image(a));
+  const initial=esc(name(a).trim().charAt(0).toUpperCase()||"P");
+  return `<article class="card" tabindex="0" role="link" data-index="${start+i}" aria-label="Abrir ${esc(name(a))}">
+   <div class="cover">${im?
+    `<img src="${esc(im)}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.classList.remove('hidden')"><div class="placeholder hidden">${initial}</div>`:
+    `<div class="placeholder">${initial}</div>`}
+   </div>
+   <span class="category">${esc(categoryLabel(cat(a)))}</span>
+   <h3>${esc(name(a))}</h3>
+  </article>`;
+ }).join("");
+ renderPages(totalPages);
+}
 
-  function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, c => ({
-      "&": "&amp;", "<": "&lt;", ">": "&gt;",
-      '"': "&quot;", "'": "&#39;"
-    })[c]);
-  }
+function renderPages(total){
+ const el=$("pages");el.innerHTML="";
+ if(total<=1)return;
+ function add(label,n,active,disabled){
+  const b=document.createElement("button");
+  b.className="page"+(active?" active":"");b.textContent=label;b.disabled=disabled;
+  b.addEventListener("click",()=>{page=n;render();$("catalogo").scrollIntoView({behavior:"smooth"});});
+  el.appendChild(b);
+ }
+ add("←",page-1,false,page===1);
+ let nums=total<=7?Array.from({length:total},(_,i)=>i+1):
+ [...new Set([1,page-1,page,page+1,total])].filter(n=>n>=1&&n<=total).sort((a,b)=>a-b);
+ let prev=0;
+ nums.forEach(n=>{
+  if(n-prev>1){const s=document.createElement("span");s.textContent="…";s.style.color="var(--muted)";el.appendChild(s);}
+  add(String(n),n,n===page,false);prev=n;
+ });
+ add("→",page+1,false,page===total);
+}
 
-  function nameOf(app) {
-    return app.name ?? app.title ?? "Sin nombre";
-  }
+function openApp(a){location.hash="app="+encodeURIComponent(slug(a))}
+function showDetail(a){
+ activeApp=a;
+ $("home").classList.add("hidden");
+ $("detail").classList.remove("hidden");
+ const n=name(a),im=safeURL(image(a)),link=safeURL(url(a)),c=categoryLabel(cat(a));
+ $("detailTitle").textContent=n;
+ $("crumbName").textContent=n;
+ $("poster").src=im||"";
+ $("poster").alt=n;
+ $("poster").style.display=im?"block":"none";
+ $("description").textContent=info(a)||"No hay información adicional disponible.";
+ $("detailCategory").textContent=c;
+ $("infoName").textContent=n;
+ $("infoCategory").textContent=c;
+ $("infoVersion").textContent=version(a)||"No especificada";
+ if(link){$("download").href=link;$("download").classList.remove("hidden");}
+ else{$("download").removeAttribute("href");$("download").classList.add("hidden");}
+ document.title=n+" | PKGX Store";
+ window.scrollTo(0,0);
+}
+function route(){
+ const h=location.hash;
+ if(h.startsWith("#app=")){
+  let s;try{s=decodeURIComponent(h.slice(5))}catch{s=h.slice(5)}
+  const a=apps.find(x=>slug(x)===s);
+  if(a){showDetail(a);return;}
+ }
+ activeApp=null;
+ $("detail").classList.add("hidden");
+ $("home").classList.remove("hidden");
+ document.title="PKGX Store";
+}
+async function share(){
+ if(!activeApp)return;
+ const data={title:name(activeApp)+" | PKGX Store",text:"Mira esta aplicación en PKGX Store",url:shareURL(activeApp)};
+ if(navigator.share){
+  try{await navigator.share(data);return}catch(e){if(e.name==="AbortError")return;}
+ }
+ try{await navigator.clipboard.writeText(data.url);alert("Enlace copiado.");}
+ catch{prompt("Copia este enlace:",data.url);}
+}
 
-  function imageOf(app) {
-    return app.image ?? app.imageUrl ?? app.imageURL ?? app.photo ?? "";
-  }
-
-  function categoryOf(app) {
-    return app.category ?? app.platform ?? "android";
-  }
-
-  function versionOf(app) {
-    return app.version ?? "";
-  }
-
-  function urlOf(app) {
-    return app.url ?? app.downloadUrl ?? app.downloadURL ?? app.link ?? "";
-  }
-
-  function descriptionOf(app) {
-    return app.description ?? app.info ?? app.details ?? "";
-  }
-
-  function slugOf(app) {
-    return String(app.slug || nameOf(app))
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase().replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
-  }
-
-  function labelOf(value) {
-    return categoryLabels[String(value).toLowerCase()] || String(value || "Aplicación");
-  }
-
-  function safeURL(value) {
-    try {
-      const u = new URL(value, location.origin);
-      return ["http:", "https:"].includes(u.protocol) ? u.href : "";
-    } catch {
-      return "";
-    }
-  }
-
-  function appURL(app) {
-    return location.origin + location.pathname + "#app=" + encodeURIComponent(slugOf(app));
-  }
-
-  async function loadApps() {
-    status.textContent = "Cargando catálogo...";
-    try {
-      const response = await fetch(API_URL, {
-        headers: { Accept: "application/json" }
-      });
-
-      if (!response.ok) throw new Error("HTTP " + response.status);
-
-      const data = await response.json();
-      const list = Array.isArray(data) ? data
-        : Array.isArray(data.apps) ? data.apps
-        : Array.isArray(data.titles) ? data.titles
-        : null;
-
-      if (!list) throw new Error("La API no devolvió una lista");
-
-      allApps = list;
-      filterApps();
-      route();
-    } catch (error) {
-      console.error(error);
-      $("count").textContent = "Sin datos";
-      status.textContent =
-        "No se pudo cargar el catálogo. Comprueba que /api/apps devuelva las aplicaciones en JSON.";
-    }
-  }
-
-  function filterApps() {
-    const query = search.value.trim().toLocaleLowerCase();
-    const selected = category.value.toLowerCase();
-
-    filteredApps = allApps.filter(app => {
-      const matchesName = nameOf(app).toLocaleLowerCase().includes(query);
-      const matchesCategory = selected === "all" ||
-        String(categoryOf(app)).toLowerCase() === selected;
-      return matchesName && matchesCategory;
-    });
-
-    currentPage = 1;
-    renderCatalog();
-  }
-
-  function renderCatalog() {
-    const total = filteredApps.length;
-    const totalPages = Math.ceil(total / PAGE_SIZE);
-
-    $("count").textContent = total + (total === 1 ? " resultado" : " resultados");
-
-    if (!total) {
-      grid.innerHTML = "";
-      pages.innerHTML = "";
-      status.textContent = allApps.length
-        ? "No encontramos resultados con esa búsqueda."
-        : "Todavía no hay aplicaciones en el catálogo.";
-      return;
-    }
-
-    status.textContent = "";
-    const start = (currentPage - 1) * PAGE_SIZE;
-    const list = filteredApps.slice(start, start + PAGE_SIZE);
-
-    grid.innerHTML = list.map((app, index) => {
-      const image = safeURL(imageOf(app));
-      const categoryName = labelOf(categoryOf(app));
-      const initial = escapeHTML(nameOf(app).trim().charAt(0).toUpperCase() || "P");
-
-      return `
-        <article class="card" tabindex="0" role="link"
-          data-index="${start + index}"
-          aria-label="Ver detalles de ${escapeHTML(nameOf(app))}">
-          <div class="cover">
-            ${
-              image
-                ? `<img src="${escapeHTML(image)}" alt="" loading="lazy"
-                    onerror="this.style.display='none';this.nextElementSibling.classList.remove('hidden')">
-                   <div class="placeholder hidden">${initial}</div>`
-                : `<div class="placeholder">${initial}</div>`
-            }
-          </div>
-          <div class="category">${escapeHTML(categoryName)}</div>
-          <h3>${escapeHTML(nameOf(app))}</h3>
-        </article>
-      `;
-    }).join("");
-
-    renderPages(totalPages);
-  }
-
-  function renderPages(totalPages) {
-    pages.innerHTML = "";
-    if (totalPages <= 1) return;
-
-    function add(label, page, active, disabled) {
-      const button = document.createElement("button");
-      button.className = "page" + (active ? " active" : "");
-      button.type = "button";
-      button.textContent = label;
-      button.disabled = disabled;
-      if (active) button.setAttribute("aria-current", "page");
-
-      button.addEventListener("click", () => {
-        if (page < 1 || page > totalPages || page === currentPage) return;
-        currentPage = page;
-        renderCatalog();
-        $("catalogo").scrollIntoView({ behavior: "smooth" });
-      });
-
-      pages.appendChild(button);
-    }
-
-    add("←", currentPage - 1, false, currentPage === 1);
-
-    let numbers;
-    if (totalPages <= 7) {
-      numbers = Array.from({ length: totalPages }, (_, i) => i + 1);
-    } else {
-      numbers = [...new Set([
-        1, currentPage - 1, currentPage,
-        currentPage + 1, totalPages
-      ])].filter(n => n >= 1 && n <= totalPages).sort((a,b) => a-b);
-    }
-
-    let previous = 0;
-    for (const n of numbers) {
-      if (n - previous > 1) {
-        const dots = document.createElement("span");
-        dots.textContent = "…";
-        dots.style.color = "var(--muted)";
-        pages.appendChild(dots);
-      }
-      add(String(n), n, n === currentPage, false);
-      previous = n;
-    }
-
-    add("→", currentPage + 1, false, currentPage === totalPages);
-  }
-
-  function openApp(app) {
-    currentApp = app;
-    location.hash = "app=" + encodeURIComponent(slugOf(app));
-  }
-
-  function showDetails(app) {
-    currentApp = app;
-    homeView.classList.add("hidden");
-    detailView.classList.remove("hidden");
-
-    const name = nameOf(app);
-    const cat = labelOf(categoryOf(app));
-    const image = safeURL(imageOf(app));
-    const downloadURL = safeURL(urlOf(app));
-
-    $("detailTitle").textContent = name;
-    $("crumbName").textContent = name;
-    $("detailImage").src = image || "";
-    $("detailImage").alt = name;
-    $("detailImage").style.display = image ? "block" : "none";
-
-    $("detailCategory").textContent = cat;
-    $("infoTitle").textContent = "Detalles de la aplicación";
-    $("infoName").textContent = name;
-    $("infoCategory").textContent = cat;
-    $("infoVersion").textContent = versionOf(app) || "No especificada";
-    $("detailDescription").textContent =
-      descriptionOf(app) || "No hay información adicional disponible.";
-
-    const download = $("download");
-    if (downloadURL) {
-      download.href = downloadURL;
-      download.classList.remove("hidden");
-    } else {
-      download.removeAttribute("href");
-      download.classList.add("hidden");
-    }
-
-    window.scrollTo({ top: 0, behavior: "instant" });
-    document.title = name + " | PKGX Store";
-  }
-
-  function route() {
-    const hash = location.hash;
-    if (hash.startsWith("#app=")) {
-      let slug = "";
-      try {
-        slug = decodeURIComponent(hash.slice(5));
-      } catch {
-        slug = hash.slice(5);
-      }
-
-      const app = allApps.find(item => slugOf(item) === slug);
-      if (app) {
-        showDetails(app);
-        return;
-      }
-    }
-
-    currentApp = null;
-    detailView.classList.add("hidden");
-    homeView.classList.remove("hidden");
-    document.title = "PKGX Store";
-  }
-
-  async function shareCurrent() {
-    if (!currentApp) return;
-    const url = appURL(currentApp);
-    const data = {
-      title: nameOf(currentApp) + " | PKGX Store",
-      text: "Mira " + nameOf(currentApp) + " en PKGX Store",
-      url
-    };
-
-    if (navigator.share) {
-      try {
-        await navigator.share(data);
-        return;
-      } catch (error) {
-        if (error.name === "AbortError") return;
-      }
-    }
-
-    try {
-      await navigator.clipboard.writeText(url);
-      alert("¡Enlace copiado! Ya puedes compartirlo.");
-    } catch {
-      prompt("Copia este enlace:", url);
-    }
-  }
-
-  grid.addEventListener("click", event => {
-    const card = event.target.closest("[data-index]");
-    if (card) openApp(filteredApps[Number(card.dataset.index)]);
-  });
-
-  grid.addEventListener("keydown", event => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    const card = event.target.closest("[data-index]");
-    if (!card) return;
-    event.preventDefault();
-    openApp(filteredApps[Number(card.dataset.index)]);
-  });
-
-  search.addEventListener("input", filterApps);
-  category.addEventListener("change", filterApps);
-  $("share").addEventListener("click", shareCurrent);
-  window.addEventListener("hashchange", route);
-  $("year").textContent = new Date().getFullYear();
-
-  loadApps();
+$("filters").addEventListener("click",e=>{
+ const b=e.target.closest("[data-category]");
+ if(!b)return;
+ selectedCategory=b.dataset.category;
+ $("filters").querySelectorAll(".filter").forEach(x=>x.classList.toggle("active",x===b));
+ filterApps();
+});
+$("search").addEventListener("input",filterApps);
+$("grid").addEventListener("click",e=>{
+ const c=e.target.closest("[data-index]");
+ if(c&&filtered[Number(c.dataset.index)])openApp(filtered[Number(c.dataset.index)]);
+});
+$("grid").addEventListener("keydown",e=>{
+ if(e.key!=="Enter"&&e.key!==" ")return;
+ const c=e.target.closest("[data-index]");
+ if(c){e.preventDefault();if(filtered[Number(c.dataset.index)])openApp(filtered[Number(c.dataset.index)]);}
+});
+$("share").addEventListener("click",share);
+window.addEventListener("hashchange",route);
+$("year").textContent=new Date().getFullYear();
+load();
 })();
 </script>
 </body>
