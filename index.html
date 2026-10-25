@@ -1,29 +1,29 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  
-<link rel="icon" type="image/png" href="https://i.ibb.co/YFgV1Pn1/file-00000000970c820ca914580a71ae74f1.png">
-<link rel="shortcut icon" type="image/png" href="https://i.ibb.co/YFgV1Pn1/file-00000000970c820ca914580a71ae74f1.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <link rel="icon" type="image/png" href="https://i.ibb.co/YFgV1Pn1/file-00000000970c820ca914580a71ae74f1.png">
+  <link rel="shortcut icon" type="image/png" href="https://i.ibb.co/YFgV1Pn1/file-00000000970c820ca914580a71ae74f1.png">
 
   <meta name="google-site-verification" content="Gsg02YKES8nmffacm-HUekW7cojT1oLdIx6sP7xKTgY">
-<meta name="description" content="PKGX Store: explora aplicaciones, emuladores, herramientas y homebrew. Encuentra tus favoritos y accede a sus enlaces de descarga desde un solo lugar.">
-<meta name="keywords" content="PKGX Store, aplicaciones, emuladores, herramientas, utilidades, homebrew, descargas">
-<meta name="author" content="xyvenqorix">
-<meta name="robots" content="index, follow">
-<meta name="theme-color" content="#0b0d10">
-<meta property="og:title" content="PKGX Store">
-<meta property="og:description" content="Explora aplicaciones, emuladores, herramientas y homebrew en PKGX Store.">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="PKGX Store">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="PKGX Store">
-<meta name="twitter:description" content="Tu catálogo de aplicaciones, emuladores y herramientas.">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#090c11">
-<meta name="description" content="PKGX Store: Emulators, Tools, Utilities y Homebrew.">
-<title>PKGX Store</title>
+  <meta name="description" content="PKGX Store: explora juegos, APK, emuladores, herramientas, utilidades y homebrew. Encuentra tus favoritos y accede a sus enlaces de descarga desde un solo lugar.">
+  <meta name="keywords" content="PKGX Store, Game, APK, juegos, aplicaciones, emuladores, herramientas, Utilities, Homebrew, descargas">
+  <meta name="author" content="xyvenqorix">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#090c11">
+
+  <meta property="og:title" content="PKGX Store">
+  <meta property="og:description" content="Explora juegos, APK, emuladores, herramientas, utilidades y homebrew en PKGX Store.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="PKGX Store">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="PKGX Store">
+  <meta name="twitter:description" content="Tu catálogo de juegos, APK, emuladores y herramientas.">
+
+  <title>PKGX Store</title>
 
 <style>
 :root{
@@ -199,7 +199,7 @@ footer strong{color:var(--green);letter-spacing:1px}
   <main>
     <section class="intro">
       <h1>Explora el catálogo <span class="green">PKGX.</span></h1>
-      <p>Emulators, Tools, Utilities y Homebrew en un solo lugar.</p>
+      <p>Games, APK, emuladores, herramientas y Homebrew en un solo lugar.</p>
     </section>
 
     <section id="catalogo">
@@ -210,6 +210,8 @@ footer strong{color:var(--green);letter-spacing:1px}
 
       <div class="filters" id="filters">
         <button class="filter active" data-category="all">Todas</button>
+        <button class="filter" data-category="game">Game</button>
+        <button class="filter" data-category="apk">APK</button>
         <button class="filter" data-category="emulators">Emulators</button>
         <button class="filter" data-category="tools">Tools</button>
         <button class="filter" data-category="utilities">Utilities</button>
@@ -276,6 +278,8 @@ let activeApp = null;
 let selectedCategory = "all";
 
 const labels = {
+  game: "Game",
+  apk: "APK",
   emulators: "Emulators",
   tools: "Tools",
   utilities: "Utilities",
@@ -297,7 +301,6 @@ function imageOf(a) {
   return a.image ?? a.imageUrl ?? a.imageURL ?? a.photo ?? "";
 }
 
-/* IMPORTANTE: tu API guarda el enlace en el campo download. */
 function urlOf(a) {
   return a.download ??
     a.url ??
@@ -312,9 +315,26 @@ function urlOf(a) {
 }
 
 function categoryOf(a) {
-  return String(a.category ?? a.platform ?? "")
+  const raw = String(a.category ?? a.platform ?? "")
+    .trim()
     .toLowerCase()
     .replace(/[\s-]+/g, "_");
+
+  const aliases = {
+    games: "game",
+    juegos: "game",
+    apk: "apk",
+    apks: "apk",
+    emulator: "emulators",
+    emuladores: "emulators",
+    herramientas: "tools",
+    tool: "tools",
+    utilidades: "utilities",
+    utility: "utilities",
+    homebrew: "homebrew"
+  };
+
+  return aliases[raw] || raw;
 }
 
 function versionOf(a) {
@@ -326,8 +346,8 @@ function descriptionOf(a) {
 }
 
 function categoryLabel(c) {
-  return labels[String(c).toLowerCase().replace(/[\s-]+/g, "_")]
-    || String(c || "Aplicación");
+  const key = String(c || "").toLowerCase().replace(/[\s-]+/g, "_");
+  return labels[key] || String(c || "Aplicación");
 }
 
 function slugOf(a) {
