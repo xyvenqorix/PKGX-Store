@@ -183,6 +183,146 @@ footer strong{color:var(--green);letter-spacing:1px}
   .back{font-size:10px;padding:9px}
   .info{padding:15px}
   .page{min-width:34px;height:35px}
+  
+/* ARANITA INTERACTIVA PKGX */
+#pkgx-spider-scene {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100px;
+  height: 1px;
+  z-index: 9999;
+  pointer-events: none;
+  overflow: visible;
+}
+
+#pkgx-spider-thread {
+  position: absolute;
+  left: 35px;
+  top: 0;
+  width: 1px;
+  height: 0;
+  background: linear-gradient(#dce5ed, #8996a8);
+  transform-origin: top;
+}
+
+#pkgx-spider {
+  position: absolute;
+  top: 0;
+  left: 10px;
+  width: 52px;
+  height: 54px;
+  overflow: visible;
+  pointer-events: auto;
+  cursor: pointer;
+  transform-origin: 50% 0;
+  animation: pkgx-spider-drop 7s ease-in-out infinite;
+}
+
+#pkgx-spider svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 2px 5px #0009);
+}
+
+#pkgx-spider .legs {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pkgx-legs .3s ease-in-out infinite alternate;
+}
+
+#pkgx-spider-scene.webbing #pkgx-spider-thread {
+  animation: pkgx-thread 1.2s ease-out forwards;
+}
+
+#pkgx-spider-scene.webbing #pkgx-spider {
+  animation: pkgx-web-launch 1.3s ease-in forwards;
+}
+
+#pkgx-spider-scene.squashed #pkgx-spider {
+  animation: pkgx-squash .45s ease-in forwards;
+}
+
+#pkgx-spider-scene.squashed #pkgx-spider-thread {
+  height: 0 !important;
+}
+
+#pkgx-spider-hint {
+  position: absolute;
+  top: 65px;
+  left: 5px;
+  width: max-content;
+  max-width: 180px;
+  padding: 6px 9px;
+  border: 1px solid #39ff8844;
+  border-radius: 8px;
+  background: #11151df2;
+  color: #dce5ed;
+  font: 11px Arial, sans-serif;
+  opacity: 0;
+  transition: opacity .2s;
+  pointer-events: none;
+}
+
+#pkgx-spider-scene:hover #pkgx-spider-hint {
+  opacity: 1;
+}
+
+#pkgx-spider-web-effect {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9998;
+  width: 130px;
+  height: 130px;
+  pointer-events: none;
+  opacity: 0;
+}
+
+#pkgx-spider-web-effect.show {
+  animation: pkgx-web-flash 1s ease-out forwards;
+}
+
+@keyframes pkgx-spider-drop {
+  0%, 8% { transform: translateY(0); }
+  25% { transform: translateY(42vh); }
+  38% { transform: translateY(42vh); }
+  55%, 100% { transform: translateY(0); }
+}
+
+@keyframes pkgx-legs {
+  from { rotate: -5deg; }
+  to { rotate: 5deg; }
+}
+
+@keyframes pkgx-thread {
+  to { height: 42vh; }
+}
+
+@keyframes pkgx-web-launch {
+  0% { transform: translateY(42vh) rotate(0); }
+  35% { transform: translateY(42vh) rotate(20deg); }
+  100% { transform: translateY(-20px) rotate(-20deg); opacity: 0; }
+}
+
+@keyframes pkgx-squash {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.45,.25) rotate(15deg); }
+  65% { transform: scale(.15,.15); opacity: .8; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+@keyframes pkgx-web-flash {
+  0% { opacity: 0; transform: scale(.2) rotate(0); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.3) rotate(35deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #pkgx-spider .legs { animation: none; }
+}
+
 }
 </style>
 </head>
